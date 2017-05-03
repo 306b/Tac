@@ -1,6 +1,8 @@
 // Copyright by GameDream.
 
 #include "Tac.h"
+#include "TacVehicle.h"
+#include "TacPlayerState.h"
 #include "RespawnPoint.h"
 
 
@@ -13,11 +15,15 @@ ARespawnPoint::ARespawnPoint()
 
 	SpawnRange = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnRange"));
 	RootComponent = SpawnRange;
+	SpawnRange->SetMobility(EComponentMobility::Static);
 	SpawnRange->bGenerateOverlapEvents = true;
+	SpawnRange->bMultiBodyOverlap = false;
 	SpawnRange->OnComponentBeginOverlap.AddDynamic(this, &ARespawnPoint::BeginOccupying);
-	//SpawnRange->OnComponentEndOverlap.AddDynamic(this, &ARespawnPoint::EndOccupying);
+	SpawnRange->OnComponentEndOverlap.AddDynamic(this, &ARespawnPoint::EndOccupying);
 
 	bOwnedByA = false;
+	bShouldOccupy = false;
+	Val_Occupation = 0.f;
 }
 
 // Called when the game starts or when spawned
@@ -32,28 +38,73 @@ void ARespawnPoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-bool ARespawnPoint::EndOccupying_Validate() { return true; }
-
-void ARespawnPoint::EndOccupying_Implementation()
-{
-
-}
-
-//bool ARespawnPoint::BeginOccupying_Validate(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) { return true; }
-
-void ARespawnPoint::BeginOccupying_Implementation(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor != nullptr)
+	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName());
+		if (bShouldOccupy && NumAInRange != 0)
+		{
+			Val_Occupation = FMath::Clamp<float>(Val_Occupation + DeltaTime * float(NumAInRange), -10.f, 10.f);
+			if (Val_Occupation == 10.f)
+			{
+				bShouldOccupy = false;
+				SetOccupied(true);
+			}
+			else if (Val_Occupation == -10.f)
+			{
+				bShouldOccupy = false;
+				SetOccupied(false);
+			}
+			UE_LOG(LogTemp, Log, TEXT("%f"), Val_Occupation);
+		}
 	}
 }
 
 void ARespawnPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
 {
 	DOREPLIFETIME(ARespawnPoint, bOwnedByA);
+//	DOREPLIFETIME(ARespawnPoint, NumAInRange);
+}
+
+void ARespawnPoint::BeginOccupying(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (HasAuthority())
+	{
+		ATacVehicle* TacPawn = Cast<ATacVehicle>(OtherActor);
+		if (TacPawn && Cast<USkeletalMeshComponent>(OtherComp))
+		{
+			bShouldOccupy = true;
+			ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
+			if (TacPS->bIsGroup_A)
+			{
+				NumAInRange = FMath::Clamp<int32>(NumAInRange + 1, -3, 3);
+			}
+			else
+			{
+				NumAInRange = FMath::Clamp<int32>(NumAInRange - 1, -3, 3);
+			}
+			UE_LOG(LogTemp, Warning, TEXT("Has %i A player"), NumAInRange);
+		}
+	}
+}
+
+void ARespawnPoint::EndOccupying(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (HasAuthority())
+	{
+		ATacVehicle* TacPawn = Cast<ATacVehicle>(OtherActor);
+		if (TacPawn && Cast<USkeletalMeshComponent>(OtherComp))
+		{
+			ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
+			if (TacPS->bIsGroup_A)
+			{
+				NumAInRange = FMath::Clamp<int32>(NumAInRange - 1, -3, 3);
+			}
+			else
+			{
+				NumAInRange = FMath::Clamp<int32>(NumAInRange + 1, -3, 3);
+			}
+			UE_LOG(LogTemp, Warning, TEXT("Has %i A player"), NumAInRange);
+		}
+	}
 }
 
 bool ARespawnPoint::SetOccupied_Validate(bool bOccupiedByA) { return true; }

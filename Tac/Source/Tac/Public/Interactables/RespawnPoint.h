@@ -33,14 +33,20 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SetOccupied(bool bOccupiedByA);
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION()
 	void BeginOccupying(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void EndOccupying();
+	UFUNCTION()
+	void EndOccupying(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
 	UPROPERTY(Replicated)
 	bool bOwnedByA;
+	//UPROPERTY(Replicated)
+	int32 NumAInRange;
+
+	bool bShouldOccupy;
+
+	float Val_Occupation;
 	
 };
