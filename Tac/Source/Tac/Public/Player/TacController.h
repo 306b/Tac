@@ -37,6 +37,12 @@ public:
 	void ClientPostLogin();
 	UFUNCTION(Client, Reliable)
 	void UpdateHUD();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void SpawnTac(FTransform SpawnTransform);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void OnPossessedTacDeath();
+
+	void ChooseRP();
 
 private:
 	/** Widget blueprint's reference */

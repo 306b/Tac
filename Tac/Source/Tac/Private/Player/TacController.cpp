@@ -8,6 +8,7 @@
 #include "GearWidget.h"
 #include "TacVehicle.h"
 #include "TacGameModeBase.h"
+#include "RespawnPoint.h"
 #include "GearManagementComponent.h"
 
 ATacController::ATacController()
@@ -30,8 +31,8 @@ void ATacController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	InputComponent->BindAction("Save", IE_Pressed, this, &ATacController::SaveGame);
-	InputComponent->BindAction("Load", IE_Pressed, this, &ATacController::LoadGame);
-	InputComponent->BindAction("Empty", IE_Pressed, this, &ATacController::EmptyGame);
+	InputComponent->BindAction("Load", IE_Pressed, this, &ATacController::ChooseRP);
+	InputComponent->BindAction("Empty", IE_Pressed, this, &ATacController::OnPossessedTacDeath);
 }
 
 /*========================================================================================================
@@ -91,15 +92,30 @@ void ATacController::EmptyGame()
 	*/
 }
 
-bool ATacController::UpdateVehicle_Validate()
+bool ATacController::SpawnTac_Validate(FTransform SpawnTransform) { return true; }
+
+void ATacController::SpawnTac_Implementation(FTransform SpawnTransform)
 {
-	return true;
+	ATacVehicle* NewTac = GetWorld()->SpawnActor<ATacVehicle>(ATacVehicle::StaticClass(), SpawnTransform);
+	Possess(NewTac);
+	UpdateVehicle();
 }
+
+bool ATacController::OnPossessedTacDeath_Validate() { return true; }
+
+void ATacController::OnPossessedTacDeath_Implementation()
+{
+	if (GetPawn())
+	{
+		GetPawn()->Destroy();
+	}
+}
+
+bool ATacController::UpdateVehicle_Validate() { return true; }
 
 void ATacController::UpdateVehicle_Implementation()
 {
 	ATacVehicle* Tac = Cast<ATacVehicle>(GetPawn());
-	// Spawns gears which player already had
 	Tac->UpdateState();
 }
 
@@ -157,5 +173,21 @@ void ATacController::UpdateHUD_Implementation()
 	if (TacView)
 	{
 		TacView->AddToViewport();
+	}
+}
+
+void ATacController::ChooseRP()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARespawnPoint::StaticClass(), FoundActors);
+	FTransform SpawnTransform;
+	if (FoundActors.Num())
+	{
+		SpawnTransform = FoundActors[0]->GetActorTransform();
+		SpawnTac(SpawnTransform);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No RP"));
 	}
 }

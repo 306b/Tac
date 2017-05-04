@@ -78,10 +78,8 @@ void ATacGameModeBase::RespawnPlayerEvent(AController * PlayerController)
 		SpawnTransform = SpawnStart_B[StartIndex]->GetActorTransform();
 		SpawnStart_B.RemoveAt(StartIndex);
 	}
-	ATacVehicle* NewTac = GetWorld()->SpawnActor<ATacVehicle>(ATacVehicle::StaticClass(), SpawnTransform);// TODO spawn BP
-	PlayerController->Possess(NewTac);
 	ATacController* TacController = Cast<ATacController>(PlayerController);
-	TacController->UpdateVehicle();
+	TacController->SpawnTac(SpawnTransform);
 }
 
 void ATacGameModeBase::ActiveGearVolume()
