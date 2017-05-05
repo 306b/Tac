@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "RespawnPoint.generated.h"
 
+class ATacVehicle;
+
 UCLASS()
 class TAC_API ARespawnPoint : public AActor
 {
@@ -34,10 +36,13 @@ public:
 	void SetOccupied(bool bOccupiedByA);
 
 	UFUNCTION()
-	void BeginOccupying(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void EndOccupying(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void UpdateActorsInRange();
 
 private:
 	UPROPERTY(Replicated)

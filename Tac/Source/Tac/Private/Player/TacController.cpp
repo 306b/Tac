@@ -109,6 +109,7 @@ void ATacController::OnPossessedTacDeath_Implementation()
 	{
 		GetPawn()->Destroy();
 	}
+	UnPossess();
 }
 
 bool ATacController::UpdateVehicle_Validate() { return true; }
