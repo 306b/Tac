@@ -10,6 +10,7 @@ class TacGameModeBase;
 /**
  * 
  */
+
 UCLASS()
 class TAC_API ATacController : public APlayerController
 {

@@ -4,6 +4,7 @@
 #include "TacVehicle.h"
 #include "TacPlayerState.h"
 #include "RespawnPoint.h"
+#include "DamageComponent.h"
 
 
 // Sets default values
@@ -42,7 +43,7 @@ void ARespawnPoint::Tick(float DeltaTime)
 	{
 		if (bShouldOccupy && NumAInRange != 0)
 		{
-			Val_Occupation = FMath::Clamp<float>(Val_Occupation + DeltaTime * float(NumAInRange), -10.f, 10.f);
+			Val_Occupation = FMath::Clamp<float>(Val_Occupation + DeltaTime * float(NumAInRange) * 0.2, -10.f, 10.f);
 			if (Val_Occupation == 10.f)
 			{
 				bShouldOccupy = false;
@@ -71,7 +72,9 @@ void ARespawnPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 		ATacVehicle* TacPawn = Cast<ATacVehicle>(OtherActor);
 		if (TacPawn && Cast<USkeletalMeshComponent>(OtherComp))
 		{
-			UpdateActorsInRange();
+			auto DamageManager = Cast<UDamageComponent>(TacPawn->GetDamageManager());
+			DamageManager->OnDeath.AddUniqueDynamic(this, &ARespawnPoint::ChangeNumber);
+			UpdateActorsInRange(TacPawn, true);
 			UE_LOG(LogTemp, Warning, TEXT("In: Has %i A player"), NumAInRange);
 		}
 	}
@@ -84,36 +87,51 @@ void ARespawnPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Ot
 		ATacVehicle* TacPawn = Cast<ATacVehicle>(OtherActor);
 		if (TacPawn && Cast<USkeletalMeshComponent>(OtherComp))
 		{
-			UpdateActorsInRange();
+			UpdateActorsInRange(TacPawn, false);
 			UE_LOG(LogTemp, Warning, TEXT("Out: Has %i A player"), NumAInRange);
 		}
 	}
 }
 
-bool ARespawnPoint::UpdateActorsInRange_Validate() { return true; }
-
-void ARespawnPoint::UpdateActorsInRange_Implementation()
+void ARespawnPoint::ChangeNumber()
 {
-	TArray<AActor*> OverlappingActors;
-	SpawnRange->GetOverlappingActors(OverlappingActors, ATacVehicle::StaticClass());
-	int32 NumA = 0;
-	for (auto Actor : OverlappingActors)
+	NumAInRange++;
+}
+
+bool ARespawnPoint::UpdateActorsInRange_Validate(ATacVehicle* TacPawn, bool bBeginOverlap) { return true; }
+
+void ARespawnPoint::UpdateActorsInRange_Implementation(ATacVehicle* TacPawn, bool bBeginOverlap)
+{
+	ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
+	if (TacPS)
 	{
-		ATacVehicle* TacPawn = Cast<ATacVehicle>(Actor);
-		ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
-		if (TacPS)
+		if (TacPS->bIsGroup_A)
 		{
-			if (TacPS->bIsGroup_A)
+			if (bBeginOverlap)
 			{
-				++NumA;
+				NumAInRange = FMath::Clamp<int32>(++NumAInRange, -3, 3);
 			}
 			else
 			{
-				--NumA;
+				NumAInRange = FMath::Clamp<int32>(--NumAInRange, -3, 3);
+			}
+		}
+		else
+		{
+			if (bBeginOverlap)
+			{
+				NumAInRange = FMath::Clamp<int32>(--NumAInRange, -3, 3);
+			}
+			else
+			{
+				NumAInRange = FMath::Clamp<int32>(++NumAInRange, -3, 3);
 			}
 		}
 	}
-	NumAInRange = FMath::Clamp<int32>(NumA, -3, 3);
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No PS"));
+	}
 }
 
 bool ARespawnPoint::SetOccupied_Validate(bool bOccupiedByA) { return true; }

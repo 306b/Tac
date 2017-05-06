@@ -81,6 +81,10 @@ void UDamageComponent::HandleDamage(float DamageVal, AActor* DamageCauser)
 		Armor = FMath::Clamp<float>(Armor - DamVal * 0.5, 0, MaxArmor);
 	}
 	Health = FMath::Clamp<int32>(Health - DamVal, 0, MaxHealth);
+	if (Health <= 0)
+	{
+		OnDeath.Broadcast();
+	}
 	StopRecoverArmor();
 	//UE_LOG(LogTemp, Log, TEXT("\nHealth: %i	DamageReceived: %i\nArmor: %i"), Health, (int32)DamVal, (int32)Armor);
 }

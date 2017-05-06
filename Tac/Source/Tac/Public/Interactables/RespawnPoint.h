@@ -42,11 +42,15 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void UpdateActorsInRange();
+	void UpdateActorsInRange(ATacVehicle* TacPawn, bool bBeginOverlap);
+
+	UFUNCTION()
+	void ChangeNumber();// TODO Delegate with parameter
 
 private:
 	UPROPERTY(Replicated)
 	bool bOwnedByA;
+
 	//UPROPERTY(Replicated)
 	int32 NumAInRange;
 

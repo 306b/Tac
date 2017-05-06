@@ -10,6 +10,7 @@
 #include "TacGameModeBase.h"
 #include "RespawnPoint.h"
 #include "GearManagementComponent.h"
+#include "DamageComponent.h"
 
 ATacController::ATacController()
 {
@@ -19,6 +20,7 @@ ATacController::ATacController()
 		PlayerView = Widget.Class;
 	}
 	TacView = nullptr;
+
 }
 
 void ATacController::BeginPlay()
@@ -96,14 +98,23 @@ bool ATacController::SpawnTac_Validate(FTransform SpawnTransform) { return true;
 
 void ATacController::SpawnTac_Implementation(FTransform SpawnTransform)
 {
-	ATacVehicle* NewTac = GetWorld()->SpawnActor<ATacVehicle>(ATacVehicle::StaticClass(), SpawnTransform);
-	Possess(NewTac);
-	UpdateVehicle();
+	if (HasAuthority())
+	{
+		ATacVehicle* NewTac = GetWorld()->SpawnActorDeferred<ATacVehicle>(ATacVehicle::StaticClass(), SpawnTransform);// TODO Spawn BP, teleport warning
+		if (NewTac)
+		{
+			Possess(NewTac);
+			UGameplayStatics::FinishSpawningActor(NewTac, NewTac->GetActorTransform());
+		}
+		auto DamageManager = Cast<UDamageComponent>(NewTac->GetDamageManager());
+		DamageManager->OnDeath.AddUniqueDynamic(this, &ATacController::OnPossessedTacDeath);
+		UpdateVehicle();
+	}
 }
 
 bool ATacController::OnPossessedTacDeath_Validate() { return true; }
 
-void ATacController::OnPossessedTacDeath_Implementation()
+void ATacController::OnPossessedTacDeath_Implementation()// TODO decrease number A in range
 {
 	if (GetPawn())
 	{
