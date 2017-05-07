@@ -41,7 +41,7 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SpawnTac(FTransform SpawnTransform);
 	UFUNCTION(Server, Reliable, WithValidation)
-	void OnPossessedTacDeath();
+	void OnPossessedTacDeath(bool bIsTeamA);
 
 	void ChooseRP();
 

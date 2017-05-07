@@ -34,7 +34,7 @@ void ATacController::SetupInputComponent()
 	Super::SetupInputComponent();
 	InputComponent->BindAction("Save", IE_Pressed, this, &ATacController::SaveGame);
 	InputComponent->BindAction("Load", IE_Pressed, this, &ATacController::ChooseRP);
-	InputComponent->BindAction("Empty", IE_Pressed, this, &ATacController::OnPossessedTacDeath);
+	//InputComponent->BindAction("Empty", IE_Pressed, this, &ATacController::OnPossessedTacDeath);
 }
 
 /*========================================================================================================
@@ -100,7 +100,7 @@ void ATacController::SpawnTac_Implementation(FTransform SpawnTransform)
 {
 	if (HasAuthority())
 	{
-		ATacVehicle* NewTac = GetWorld()->SpawnActorDeferred<ATacVehicle>(ATacVehicle::StaticClass(), SpawnTransform);// TODO Spawn BP, teleport warning
+		ATacVehicle* NewTac = GetWorld()->SpawnActorDeferred<ATacVehicle>(ATacVehicle::StaticClass(), SpawnTransform, this, Instigator, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);// TODO Spawn BP, teleport warning
 		if (NewTac)
 		{
 			Possess(NewTac);
@@ -112,9 +112,9 @@ void ATacController::SpawnTac_Implementation(FTransform SpawnTransform)
 	}
 }
 
-bool ATacController::OnPossessedTacDeath_Validate() { return true; }
+bool ATacController::OnPossessedTacDeath_Validate(bool bIsTeamA) { return true; }
 
-void ATacController::OnPossessedTacDeath_Implementation()// TODO decrease number A in range
+void ATacController::OnPossessedTacDeath_Implementation(bool bIsTeamA)// TODO decrease number A in range
 {
 	if (GetPawn())
 	{

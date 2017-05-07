@@ -6,7 +6,7 @@
 #include "TacHeader.h"
 #include "DamageComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTacDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTacDelegate, bool, bIsTeamA);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TAC_API UDamageComponent : public UActorComponent

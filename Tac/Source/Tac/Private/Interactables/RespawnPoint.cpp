@@ -93,9 +93,16 @@ void ARespawnPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	}
 }
 
-void ARespawnPoint::ChangeNumber()
+void ARespawnPoint::ChangeNumber(bool bIsTeamA)
 {
-	NumAInRange++;
+	if (bIsTeamA)
+	{
+		--NumAInRange;
+	}
+	else
+	{
+		++NumAInRange;
+	}
 }
 
 bool ARespawnPoint::UpdateActorsInRange_Validate(ATacVehicle* TacPawn, bool bBeginOverlap) { return true; }

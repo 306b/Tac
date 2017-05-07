@@ -45,7 +45,7 @@ public:
 	void UpdateActorsInRange(ATacVehicle* TacPawn, bool bBeginOverlap);
 
 	UFUNCTION()
-	void ChangeNumber();// TODO Delegate with parameter
+	void ChangeNumber(bool bIsTeamA);// TODO Delegate with parameter
 
 private:
 	UPROPERTY(Replicated)
