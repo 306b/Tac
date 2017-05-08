@@ -26,6 +26,20 @@ ATacController::ATacController()
 void ATacController::BeginPlay()
 {
 	Super::BeginPlay();
+	if (HasAuthority())
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
+		for (auto Actor : FoundActors)
+		{
+			if (Actor->ActorHasTag(TEXT("Monitor")))
+			{
+				auto MC = Cast<ACameraActor>(Actor);
+				MonitorCamera = MC;
+				UE_LOG(LogTemp, Error, TEXT("Monitor initialized"));
+			}
+		}
+	}	
 }
 
 // Directly uses input component in controller
@@ -121,6 +135,8 @@ void ATacController::OnPossessedTacDeath_Implementation(bool bIsTeamA)// TODO de
 		GetPawn()->Destroy();
 	}
 	UnPossess();
+	if (!MonitorCamera) { return; }
+	SetViewTargetWithBlend(MonitorCamera, 0.75f);
 }
 
 bool ATacController::UpdateVehicle_Validate() { return true; }

@@ -45,9 +45,12 @@ public:
 
 	void ChooseRP();
 
+	
+
 private:
 	/** Widget blueprint's reference */
 	UPROPERTY()
 	TSubclassOf<class UUserWidget> PlayerView;
 	
+	ACameraActor* MonitorCamera;
 };
