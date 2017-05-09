@@ -163,9 +163,19 @@ void ATacController::UpdateHUD_Implementation()
 	}
 }
 
-FVector ATacController::Aimat(FVector StartLoc, float LaunchVelocity)
+void ATacController::Aimat_Implementation(AProjectile* PP, FVector StartLoc, float LaunchVelocity)
 {
-	FVector OutLaunchVelocity;
+	if (!IsLocalController())
+	{
+		UE_LOG(LogTemp, Error, TEXT("No local controller!"));
+		return;
+	}
+	int32 ScreenX, ScreenY;
+	GetViewportSize(ScreenX, ScreenY);
+	UE_LOG(LogTemp, Warning, TEXT("Res: %i, %i"), ScreenX, ScreenY);
+	PP->LaunchProjectile(FVector(float(ScreenX), float(ScreenY), 0.f));
+	return;
+	/*FVector OutLaunchVelocity;
 	FVector HitLocation;
 	GetSightRayHitLocation(HitLocation);
 	auto AimSolution = UGameplayStatics::SuggestProjectileVelocity(
@@ -178,7 +188,7 @@ FVector ATacController::Aimat(FVector StartLoc, float LaunchVelocity)
 		0.f,
 		0.f,
 		ESuggestProjVelocityTraceOption::DoNotTrace);
-	return OutLaunchVelocity.GetSafeNormal();
+	return OutLaunchVelocity.GetSafeNormal();*/
 }
 
 

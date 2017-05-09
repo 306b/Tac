@@ -42,7 +42,7 @@ public:
 	
 public:
 	// Activite the projectile
-	//UFUNCTION(Server, Reliable, WithValidation)
+	//UFUNCTION(NetMulticast, Reliable)
 	void LaunchProjectile(FVector OutLaunchVelocity);
 	AActor* OwnerGun;
 	float GetLaunchSpeed();

@@ -27,15 +27,9 @@ void AGear_Gun::OnLClickHit_Implementation(AActor* Target)
 			Projectile->CollisionSphere->IgnoreActorWhenMoving(Target, true);
 			APawn* TacPawn = Cast<APawn>(GetAttachParentActor());
 			ATacController* TC = Cast<ATacController>(TacPawn->Controller);
-			UE_LOG(LogTemp, Error, TEXT("%s"), *TC->GetName());
+			//UE_LOG(LogTemp, Error, TEXT("%s"), *TC->GetName());
 			auto StartLocation = GunMesh->GetSocketLocation(TEXT("Fire")); 
-			FVector LaunchVelocity = TC->Aimat(StartLocation, Projectile->GetLaunchSpeed());
-			LaunchProjectile(Projectile, LaunchVelocity);
+			TC->Aimat(Projectile, StartLocation, Projectile->GetLaunchSpeed());
 		}
 	}
-}
-
-void AGear_Gun::LaunchProjectile(AProjectile* ProjectileToLaunch, FVector LaunchVelocity)
-{
-	ProjectileToLaunch->LaunchProjectile(LaunchVelocity);
 }

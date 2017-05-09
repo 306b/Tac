@@ -26,6 +26,7 @@ AProjectile::AProjectile()
 	DamageAmount = 30.f;
 	LaunchSpeed = 10000.f;
 
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -79,8 +80,8 @@ bool AProjectile::LaunchProjectile_Validate()
 void AProjectile::LaunchProjectile(FVector OutLaunchVelocity)
 
 {
-	ProjectileMovementComponent->SetVelocityInLocalSpace(OutLaunchVelocity * LaunchSpeed);
-	ProjectileMovementComponent->Activate();
+	//ProjectileMovementComponent->SetVelocityInLocalSpace(OutLaunchVelocity * LaunchSpeed);
+	//ProjectileMovementComponent->Activate();
 	UE_LOG(LogTemp, Error, TEXT("%s"), *OutLaunchVelocity.ToString());
 }
 
