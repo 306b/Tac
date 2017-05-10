@@ -5,7 +5,7 @@
 #include "TacSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "TacPlayerState.h"
-#include "GearWidget.h"
+#include "TacWidget.h"
 #include "TacVehicle.h"
 #include "TacGameModeBase.h"
 #include "RespawnPoint.h"
@@ -14,7 +14,7 @@
 
 ATacController::ATacController()
 {
-	static ConstructorHelpers::FClassFinder<UGearWidget> Widget(TEXT("/Game/Tac/Core/Characters/WBP_TacView"));
+	static ConstructorHelpers::FClassFinder<UTacWidget> Widget(TEXT("/Game/Tac/Core/Characters/WBP_TacView"));
 	if (Widget.Succeeded())
 	{
 		PlayerView = Widget.Class;
@@ -197,7 +197,7 @@ void ATacController::UpdateHUD_Implementation()
 		UE_LOG(LogTemp, Error, TEXT("Is not local controller"));
 		return;
 	}
-	TacView = CreateWidget<UGearWidget>(this, PlayerView);
+	TacView = CreateWidget<UTacWidget>(this, PlayerView);
 	if (TacView)
 	{
 		TacView->AddToViewport();

@@ -22,7 +22,7 @@ public:
 	virtual void SetupInputComponent() override;
 
 	// Variable to hold the widget After Creating it.
-	class UGearWidget* TacView;
+	class UTacWidget* TacView;
 
 	/** Save the game */
 	void SaveGame();

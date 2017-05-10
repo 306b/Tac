@@ -5,6 +5,8 @@
 #include "TacPlayerState.h"
 #include "RespawnPoint.h"
 #include "DamageComponent.h"
+#include "TacWidget.h"
+#include "WidgetComponent.h"
 
 
 // Sets default values
@@ -22,6 +24,8 @@ ARespawnPoint::ARespawnPoint()
 	SpawnRange->OnComponentBeginOverlap.AddDynamic(this, &ARespawnPoint::OnOverlapBegin);
 	SpawnRange->OnComponentEndOverlap.AddDynamic(this, &ARespawnPoint::OnOverlapEnd);
 
+	OccupationBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("OccupationBar"));
+	OccupationBar->SetupAttachment(RootComponent);
 	bOwnedByA = false;
 	bShouldOccupy = true;
 	Val_Occupation = 0.f;
@@ -31,7 +35,13 @@ ARespawnPoint::ARespawnPoint()
 void ARespawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	UTacWidget* WidgetClass = Cast<UTacWidget>(OccupationBar->GetUserWidgetObject());
+	if (!WidgetClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No widget class"));
+		return;
+	}
+	WidgetClass->UpdateOccupation(this);
 }
 
 // Called every frame
@@ -103,6 +113,11 @@ void ARespawnPoint::ChangeNumber(bool bIsTeamA)
 	{
 		++NumAInRange;
 	}
+}
+
+float ARespawnPoint::GetOccupationVal()
+{
+	return Val_Occupation;
 }
 
 bool ARespawnPoint::UpdateActorsInRange_Validate(ATacVehicle* TacPawn, bool bBeginOverlap) { return true; }
