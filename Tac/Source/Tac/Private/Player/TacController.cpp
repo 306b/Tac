@@ -94,10 +94,7 @@ void ATacController::EmptyGame()
 	*/
 }
 
-bool ATacController::UpdateVehicle_Validate()
-{
-	return true;
-}
+bool ATacController::UpdateVehicle_Validate() { return true; }
 
 void ATacController::UpdateVehicle_Implementation()
 {
@@ -116,10 +113,7 @@ void ATacController::AddGearSlot_Implementation(int32 GearIndex)
 	TacView->AddGearSlot(GearIndex);
 }
 
-bool ATacController::ClientPostLogin_Validate()
-{
-	return true;
-}
+bool ATacController::ClientPostLogin_Validate() { return true; }
 
 void ATacController::ClientPostLogin_Implementation()
 {
@@ -163,19 +157,14 @@ void ATacController::UpdateHUD_Implementation()
 	}
 }
 
-void ATacController::Aimat_Implementation(AProjectile* PP, FVector StartLoc, float LaunchVelocity)
+void ATacController::Aimat_Implementation(FVector StartLoc, float LaunchVelocity)
 {
 	if (!IsLocalController())
 	{
 		UE_LOG(LogTemp, Error, TEXT("No local controller!"));
 		return;
 	}
-	int32 ScreenX, ScreenY;
-	GetViewportSize(ScreenX, ScreenY);
-	UE_LOG(LogTemp, Warning, TEXT("Res: %i, %i"), ScreenX, ScreenY);
-	PP->LaunchProjectile(FVector(float(ScreenX), float(ScreenY), 0.f));
-	return;
-	/*FVector OutLaunchVelocity;
+	FVector OutLaunchVelocity;
 	FVector HitLocation;
 	GetSightRayHitLocation(HitLocation);
 	auto AimSolution = UGameplayStatics::SuggestProjectileVelocity(
@@ -188,9 +177,8 @@ void ATacController::Aimat_Implementation(AProjectile* PP, FVector StartLoc, flo
 		0.f,
 		0.f,
 		ESuggestProjVelocityTraceOption::DoNotTrace);
-	return OutLaunchVelocity.GetSafeNormal();*/
+	UE_LOG(LogTemp, Warning, TEXT("Result: %s"), *OutLaunchVelocity.GetSafeNormal().ToString());
 }
-
 
 bool ATacController::GetSightRayHitLocation(FVector& HitLocation) const
 {
@@ -198,12 +186,13 @@ bool ATacController::GetSightRayHitLocation(FVector& HitLocation) const
 	int32 ScreenX, ScreenY;
 	FVector2D ViewportSize;
 	GetViewportSize(ScreenX, ScreenY);
-	auto ScreenLocation = FVector2D(ScreenX * CrosshairXLocation, ScreenY * CrosshairYLocation);
+	FVector2D ScreenLocation = FVector2D(ScreenX * CrosshairXLocation, ScreenY * CrosshairYLocation);
 	FVector WorldDirection;
-	UE_LOG(LogTemp, Error, TEXT("ScreenLocation: %s"), *ScreenLocation.ToString());
 	if (GetLookDirection(ScreenLocation, WorldDirection))
 	{
-		return GetLookHitLocation(WorldDirection, HitLocation);
+		bool GLD = GetLookHitLocation(WorldDirection, HitLocation);
+		UE_LOG(LogTemp, Error, TEXT("GLD: %i"), GLD);
+		return GLD;
 	}
 	return false;
 }
@@ -211,15 +200,13 @@ bool ATacController::GetSightRayHitLocation(FVector& HitLocation) const
 bool ATacController::GetLookDirection(FVector2D ScreenLocation, FVector& WorldDirection) const
 {
 	FVector WorldLocation;
-	DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, WorldLocation, WorldDirection);
-	UE_LOG(LogTemp, Error, TEXT("Result: %i\tScreenToWorld location: %s"), *WorldDirection.ToString());
 	return DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, WorldLocation, WorldDirection);
 }
 
 bool ATacController::GetLookHitLocation(FVector WorldDirection, FVector& HitLocation) const
 {
 	FHitResult Hit;
-	FVector CameraLocation;
+	FVector CameraLocation;// TODO The correct way of line trace
 	FRotator CameraRotation;
 	GetActorEyesViewPoint(CameraLocation, CameraRotation);
 	if (GetWorld()->LineTraceSingleByChannel(

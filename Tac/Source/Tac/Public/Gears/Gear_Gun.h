@@ -23,7 +23,10 @@ public:
 	virtual void OnLClickHit(AActor* Target) override;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gear|Gun")
 	float ArmorPenetration = 0.5f;
-	
+
+	//UFUNCTION(NetMulticast, Reliable)
+	//void Launch(AProjectile* PP, FVector LaunchVelocity);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gear|Gun")
 	int32 Ammo = 10;

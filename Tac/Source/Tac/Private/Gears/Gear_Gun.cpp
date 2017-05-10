@@ -21,15 +21,18 @@ void AGear_Gun::OnLClickHit_Implementation(AActor* Target)
 		{
 			auto SpawnLocation = GunMesh->GetSocketLocation(TEXT("Fire"));
 			auto SpawnRotation = GunMesh->GetSocketRotation(TEXT("Fire"));
-			auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+			static AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
 			Projectile->Instigator = Cast<APawn>(Target);
 			Projectile->OwnerGun = this;
 			Projectile->CollisionSphere->IgnoreActorWhenMoving(Target, true);
 			APawn* TacPawn = Cast<APawn>(GetAttachParentActor());
 			ATacController* TC = Cast<ATacController>(TacPawn->Controller);
-			//UE_LOG(LogTemp, Error, TEXT("%s"), *TC->GetName());
-			auto StartLocation = GunMesh->GetSocketLocation(TEXT("Fire")); 
-			TC->Aimat(Projectile, StartLocation, Projectile->GetLaunchSpeed());
+			TC->Aimat(SpawnLocation, Projectile->GetLaunchSpeed());
 		}
 	}
 }
+//
+//void AGear_Gun::Launch_Implementation(AProjectile * PP, FVector LaunchVelocity)
+//{
+//	PP->LaunchProjectile(LaunchVelocity);
+//}

@@ -80,6 +80,11 @@ bool AProjectile::LaunchProjectile_Validate()
 void AProjectile::LaunchProjectile(FVector OutLaunchVelocity)
 
 {
+	if (!HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("PP: no auth"));
+		return;
+	}
 	//ProjectileMovementComponent->SetVelocityInLocalSpace(OutLaunchVelocity * LaunchSpeed);
 	//ProjectileMovementComponent->Activate();
 	UE_LOG(LogTemp, Error, TEXT("%s"), *OutLaunchVelocity.ToString());

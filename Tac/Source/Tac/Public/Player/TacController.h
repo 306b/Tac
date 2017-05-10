@@ -41,7 +41,7 @@ public:
 	void UpdateHUD();
 
 	UFUNCTION(Client, Reliable)
-	void Aimat(AProjectile* PP, FVector StartLoc, float LaunchVelocity);
+	void Aimat(FVector StartLoc, float LaunchVelocity);
 	bool GetLookHitLocation(FVector WorldDirection, FVector& HitLocation) const;
 	bool GetLookDirection(FVector2D ScreenLocation, FVector& WorldDirection) const;
 	bool GetSightRayHitLocation(FVector& HitLocation) const;
