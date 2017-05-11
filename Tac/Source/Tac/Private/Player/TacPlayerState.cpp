@@ -3,11 +3,24 @@
 #include "Tac.h"
 #include "TacPlayerState.h"
 #include "Gears.h"
+#include "TacGameState.h"
 #include "Kismet/GameplayStatics.h"
 
 ATacPlayerState::ATacPlayerState()
 {
+	bIsGroup_A = false;
+	NumKills = 0;
+	NumDeaths = 0;
+}
 
+void ATacPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATacPlayerState, bIsGroup_A);
+	DOREPLIFETIME(ATacPlayerState, TeamNumber);
+	DOREPLIFETIME(ATacPlayerState, NumKills);
+	DOREPLIFETIME(ATacPlayerState, NumDeaths);
 }
 
 TArray<TSubclassOf<AGears>> ATacPlayerState::GetGears()
@@ -97,4 +110,78 @@ void ATacPlayerState::EmptyGears_Implementation()
 {
 	Gears.Empty();
 	Gears.SetNum(4);
+}
+
+void ATacPlayerState::Reset()
+{
+	Super::Reset();
+
+	//PlayerStates persist across seamless travel.  Keep the same teams as previous match.
+	//SetTeamNum(0);
+	NumKills = 0;
+	NumDeaths = 0;
+
+}
+
+void ATacPlayerState::SetTeam(bool bTeamA)
+{
+	bIsGroup_A = bTeamA;
+	ATacGameState* const MyGameState = GetWorld()->GetGameState<ATacGameState>();
+	if (!MyGameState) 
+	{ 
+		UE_LOG(LogTemp, Error, TEXT("No game state"));
+		return; 
+	}
+	if (MyGameState->TeamScores.Num() == 0)
+	{
+		MyGameState->TeamScores.AddZeroed(2);
+	}
+}
+
+int32 ATacPlayerState::GetTeamNum() const
+{
+	return 1;
+}
+
+int32 ATacPlayerState::GetKills() const
+{
+	return NumKills;
+}
+
+int32 ATacPlayerState::GetDeaths() const
+{
+	return NumDeaths;
+}
+
+float ATacPlayerState::GetScore() const
+{
+	return Score;
+}
+
+void ATacPlayerState::ScoreKill(ATacPlayerState* Victim, int32 Points)
+{
+	NumKills++;
+	ScorePoints(Points);
+}
+
+void ATacPlayerState::ScoreDeath(ATacPlayerState* KilledBy, int32 Points)
+{
+	NumDeaths++;
+}
+
+void ATacPlayerState::ScorePoints(int32 Points)
+{
+	ATacGameState* const MyGameState = GetWorld()->GetGameState<ATacGameState>();
+	if (MyGameState)
+	{
+		if (bIsGroup_A)
+		{
+			MyGameState->TeamScores[0] += Points;
+        }
+		else
+		{
+			MyGameState->TeamScores[1] += Points;
+		}
+	}
+	Score += Points;
 }

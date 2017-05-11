@@ -41,6 +41,8 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void EmptyGears();
+
+	
 private:
 	/*==========================================
 		Saves player state for synchronizing	
@@ -49,8 +51,52 @@ private:
 	TArray<TSubclassOf<AGears>> Gears;
 	FString MyPlayerName = TEXT("Tacky");
 	int32 GearsAmount;
-	
+
+
 public:
 	int32 PlayerNumber;
-	bool bIsGroup_A;
+
+public:
+	/** clear scores */
+	virtual void Reset() override;
+
+	void SetTeam(bool bTeamA);
+
+	/** player killed someone */
+	void ScoreKill(ATacPlayerState* Victim, int32 Points);
+
+	/** player died */
+	void ScoreDeath(ATacPlayerState* KilledBy, int32 Points);
+
+	/** get current team */
+	int32 GetTeamNum() const;
+
+	/** get number of kills */
+	int32 GetKills() const;
+
+	/** get number of deaths */
+	int32 GetDeaths() const;
+
+	/** get number of points */
+	float GetScore() const;
+
+	/** team number */
+	UPROPERTY(Transient, Replicated)
+		bool bIsGroup_A;
+
+protected:
+
+	UPROPERTY(Transient, Replicated)
+		int32 TeamNumber;
+
+	/** number of kills */
+	UPROPERTY(Transient, Replicated)
+		int32 NumKills;
+
+	/** number of deaths */
+	UPROPERTY(Transient, Replicated)
+		int32 NumDeaths;
+
+	/** helper for scoring points */
+	void ScorePoints(int32 Points);
 };
