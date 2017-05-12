@@ -14,12 +14,6 @@
 
 ATacController::ATacController()
 {
-	static ConstructorHelpers::FClassFinder<UTacWidget> Widget(TEXT("/Game/Tac/Core/Characters/WBP_TacView"));
-	if (Widget.Succeeded())
-	{
-		PlayerView = Widget.Class;
-	}
-	TacView = nullptr;
 
 }
 
@@ -187,20 +181,6 @@ void ATacController::ClientPostLogin_Implementation()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Client"));
-	}
-}
-
-void ATacController::UpdateHUD_Implementation()
-{
-	if (!IsLocalController())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Is not local controller"));
-		return;
-	}
-	TacView = CreateWidget<UTacWidget>(this, PlayerView);
-	if (TacView)
-	{
-		TacView->AddToViewport();
 	}
 }
 

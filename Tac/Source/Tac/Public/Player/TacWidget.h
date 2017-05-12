@@ -20,7 +20,7 @@ public:
 	void AddGearSlot(int32 GearIndex);
 	// To update RespawnPoint's occupation prograss bar
 	UFUNCTION(BlueprintImplementableEvent, Category = "State")
-	void UpdateOccupation(AActor* RP);
+	void UpdateOccupation(float Val);
 	UFUNCTION(BlueprintImplementableEvent, Category = "State")
 	void InitializePlayerState();
 

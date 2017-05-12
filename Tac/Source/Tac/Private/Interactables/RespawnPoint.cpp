@@ -24,8 +24,6 @@ ARespawnPoint::ARespawnPoint()
 	SpawnRange->OnComponentBeginOverlap.AddDynamic(this, &ARespawnPoint::OnOverlapBegin);
 	SpawnRange->OnComponentEndOverlap.AddDynamic(this, &ARespawnPoint::OnOverlapEnd);
 
-	OccupationBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("OccupationBar"));
-	OccupationBar->SetupAttachment(RootComponent);
 	bOwnedByA = false;
 	bShouldOccupy = true;
 	Val_Occupation = 0.f;
@@ -35,13 +33,6 @@ ARespawnPoint::ARespawnPoint()
 void ARespawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	UTacWidget* WidgetClass = Cast<UTacWidget>(OccupationBar->GetUserWidgetObject());
-	if (!WidgetClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("No widget class"));
-		return;
-	}
-	WidgetClass->UpdateOccupation(this);
 }
 
 // Called every frame

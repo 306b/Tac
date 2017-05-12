@@ -46,7 +46,6 @@ void ATacGameModeBase::PostLogin(APlayerController* NewController)
 		NewTacPlayerState->PlayerNumber = GameState->PlayerArray.Num();
 		ATacController* NewTacController = Cast<ATacController>(NewController);
 		NewTacController->ClientPostLogin();
-		NewTacController->UpdateHUD();
 	}
 }
 

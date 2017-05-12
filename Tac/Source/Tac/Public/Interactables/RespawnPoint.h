@@ -6,7 +6,6 @@
 #include "RespawnPoint.generated.h"
 
 class ATacVehicle;
-class UWidgetComponent;
 
 UCLASS()
 class TAC_API ARespawnPoint : public AActor
@@ -20,9 +19,6 @@ public:
 	// Range for spawning players
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Spawning)
 	UBoxComponent* SpawnRange;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UMG)
-	UWidgetComponent* OccupationBar;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

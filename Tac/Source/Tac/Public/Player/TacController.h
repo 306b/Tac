@@ -36,8 +36,6 @@ public:
 	void AddGearSlot(int32 GearIndex);
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ClientPostLogin();
-	UFUNCTION(Client, Reliable)
-	void UpdateHUD();
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SpawnTac(FTransform SpawnTransform);
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -48,9 +46,6 @@ public:
 	
 
 private:
-	/** Widget blueprint's reference */
-	UPROPERTY()
-	TSubclassOf<class UUserWidget> PlayerView;
 	
 	ACameraActor* MonitorCamera;
 };
