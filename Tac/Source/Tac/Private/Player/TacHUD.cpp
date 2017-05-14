@@ -4,7 +4,15 @@
 #include "TacHUD.h"
 #include "RespawnPoint.h"
 
-ARespawnPoint * ATacHUD::GetRP() const
+TArray<ARespawnPoint*> ATacHUD::GetRPs() const
 {
-	return RP;
+	return RPs;
+}
+
+void ATacHUD::SetRPs(TArray<ARespawnPoint*> RPsToSet)
+{
+	for (auto Actor : RPsToSet)
+	{
+		RPs.Push(Actor);
+	}
 }

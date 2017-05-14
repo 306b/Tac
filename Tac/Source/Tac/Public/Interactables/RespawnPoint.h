@@ -26,10 +26,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	void UpdateOccupation(float DeltaTime);
+	
 	// Spawn players' function
-	UFUNCTION(Server, Reliable, WithValidation)
+	UFUNCTION(BlueprintCallable)
 	void SpawnPlayer(AController* PlayerController);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SpawnPlayer(AController* PlayerController);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SetOccupied(bool bOccupiedByA);
@@ -57,8 +61,9 @@ private:
 	//UPROPERTY(Replicated)
 	int32 NumAInRange;
 
+	
 	bool bShouldOccupy;
-
+	UPROPERTY(Replicated)
 	float Val_Occupation;
 	
 };

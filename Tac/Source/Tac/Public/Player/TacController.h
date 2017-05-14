@@ -6,7 +6,8 @@
 #include "TacVehicle.h"
 #include "TacController.generated.h"
 
-class TacGameModeBase;
+class ATacGameModeBase;
+class ARespawnPoint;
 /**
  * 
  */
@@ -20,9 +21,6 @@ public:
 	ATacController();
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-
-	// Variable to hold the widget After Creating it.
-	class UTacWidget* TacView;
 
 	/** Save the game */
 	void SaveGame();
@@ -41,9 +39,14 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void OnPossessedTacDeath(bool bIsTeamA);
 
-	void ChooseRP();
+	void ChooseRP(int32 RPIndex);
 
-	
+	UFUNCTION(Client, Reliable)
+	void FindRPs();
+	void FindRPs_Implementation();
+	void FindMonitor();
+
+	TArray<ARespawnPoint*> Respawnings;
 
 private:
 	

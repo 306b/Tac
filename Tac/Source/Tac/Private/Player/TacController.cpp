@@ -9,6 +9,7 @@
 #include "TacVehicle.h"
 #include "TacGameModeBase.h"
 #include "RespawnPoint.h"
+#include "TacHUD.h"
 #include "GearManagementComponent.h"
 #include "DamageComponent.h"
 
@@ -20,20 +21,11 @@ ATacController::ATacController()
 void ATacController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (HasAuthority())
+	if (Role < ROLE_Authority)
 	{
-		TArray<AActor*> FoundActors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
-		for (auto Actor : FoundActors)
-		{
-			if (Actor->ActorHasTag(TEXT("Monitor")))
-			{
-				auto MC = Cast<ACameraActor>(Actor);
-				MonitorCamera = MC;
-				UE_LOG(LogTemp, Error, TEXT("Monitor initialized"));
-			}
-		}
-	}	
+		FindMonitor();
+		FindRPs();
+	}
 }
 
 // Directly uses input component in controller
@@ -41,7 +33,6 @@ void ATacController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	InputComponent->BindAction("Save", IE_Pressed, this, &ATacController::SaveGame);
-	InputComponent->BindAction("Load", IE_Pressed, this, &ATacController::ChooseRP);
 	//InputComponent->BindAction("Empty", IE_Pressed, this, &ATacController::OnPossessedTacDeath);
 }
 
@@ -148,7 +139,11 @@ void ATacController::AddGearSlot_Implementation(int32 GearIndex)
 		UE_LOG(LogTemp, Error, TEXT("Is not local controller"));
 		return;
 	}
-	TacView->AddGearSlot(GearIndex);
+	auto TacHud = Cast<ATacHUD>(GetHUD());
+	if (TacHud)
+	{
+		TacHud->AddGearSlot(GearIndex);
+	}
 }
 
 bool ATacController::ClientPostLogin_Validate()
@@ -184,18 +179,53 @@ void ATacController::ClientPostLogin_Implementation()
 	}
 }
 
-void ATacController::ChooseRP()
+void ATacController::ChooseRP(int32 RPIndex)
 {
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARespawnPoint::StaticClass(), FoundActors);
 	FTransform SpawnTransform;
-	if (FoundActors.Num())
+	if (Respawnings.IsValidIndex(RPIndex))
 	{
-		SpawnTransform = FoundActors[0]->GetActorTransform();
+		SpawnTransform = Respawnings[RPIndex]->GetActorTransform();
 		SpawnTac(SpawnTransform);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("No RP"));
+	}
+}
+
+void ATacController::FindRPs_Implementation()
+{
+	if (!IsLocalController())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Is not local controller"));
+		return;
+	}
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARespawnPoint::StaticClass(), FoundActors);
+	for (auto Actor : FoundActors)
+	{
+		auto Respawning = Cast<ARespawnPoint>(Actor);
+		Respawnings.Push(Respawning);
+	}
+	auto TacHud = Cast<ATacHUD>(GetHUD());
+	if (TacHud)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Has hud"));
+		TacHud->SetRPs(Respawnings);
+	}
+}
+
+void ATacController::FindMonitor()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
+	for (auto Actor : FoundActors)
+	{
+		if (Actor->ActorHasTag(TEXT("Monitor")))
+		{
+			auto MC = Cast<ACameraActor>(Actor);
+			MonitorCamera = MC;
+			UE_LOG(LogTemp, Error, TEXT("Monitor initialized"));
+		}
 	}
 }

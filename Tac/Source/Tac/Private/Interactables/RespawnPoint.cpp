@@ -39,30 +39,13 @@ void ARespawnPoint::BeginPlay()
 void ARespawnPoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (HasAuthority())
-	{
-		if (bShouldOccupy && NumAInRange != 0)
-		{
-			Val_Occupation = FMath::Clamp<float>(Val_Occupation + DeltaTime * float(NumAInRange) * 0.2, -10.f, 10.f);
-			if (Val_Occupation == 10.f)
-			{
-				bShouldOccupy = false;
-				SetOccupied(true);
-			}
-			else if (Val_Occupation == -10.f)
-			{
-				bShouldOccupy = false;
-				SetOccupied(false);
-			}
-			UE_LOG(LogTemp, Log, TEXT("%f"), Val_Occupation);
-		}
-	}
+	UpdateOccupation(DeltaTime);
 }
 
 void ARespawnPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
 {
 	DOREPLIFETIME(ARespawnPoint, bOwnedByA);
+	DOREPLIFETIME(ARespawnPoint, Val_Occupation);
 	//DOREPLIFETIME(ARespawnPoint, NumAInRange);
 }
 
@@ -90,6 +73,28 @@ void ARespawnPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Ot
 		{
 			UpdateActorsInRange(TacPawn, false);
 			UE_LOG(LogTemp, Warning, TEXT("Out: Has %i A player"), NumAInRange);
+		}
+	}
+}
+
+void ARespawnPoint::UpdateOccupation(float DeltaTime)
+{
+	if (Role == ROLE_Authority)
+	{
+		if (bShouldOccupy && NumAInRange != 0)
+		{
+			Val_Occupation = FMath::Clamp<float>(Val_Occupation + DeltaTime * float(NumAInRange) * 0.2, -10.f, 10.f);
+			if (Val_Occupation == 10.f)
+			{
+				bShouldOccupy = false;
+				SetOccupied(true);
+			}
+			else if (Val_Occupation == -10.f)
+			{
+				bShouldOccupy = false;
+				SetOccupied(false);
+			}
+			UE_LOG(LogTemp, Log, TEXT("%f"), Val_Occupation);
 		}
 	}
 }
@@ -161,10 +166,22 @@ void ARespawnPoint::SetOccupied_Implementation(bool bOccupiedByA)
 	}
 }
 
-bool ARespawnPoint::SpawnPlayer_Validate(AController * PlayerController) { return true; }
+bool ARespawnPoint::Server_SpawnPlayer_Validate(AController * PlayerController) { return true; }
 
-void ARespawnPoint::SpawnPlayer_Implementation(AController * PlayerController)
+void ARespawnPoint::Server_SpawnPlayer_Implementation(AController * PlayerController)
 {
+	SpawnPlayer(PlayerController);
+}
 
+void ARespawnPoint::SpawnPlayer(AController * PlayerController)
+{
+	if (Role < ROLE_Authority)
+	{
+		Server_SpawnPlayer(PlayerController);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Server: %s"), *PlayerController->GetName());
+	}
 }
 
