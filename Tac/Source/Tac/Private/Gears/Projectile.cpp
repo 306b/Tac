@@ -2,6 +2,8 @@
 
 #include "Tac.h"
 #include "Projectile.h"
+#include "TacVehicle.h"
+#include "TacBase.h"
 #include "VehicleDamageType.h"
 
 // Sets default values
@@ -46,25 +48,38 @@ void AProjectile::Tick(float DeltaTime)
 
 void AProjectile::OnHit_Implementation(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
 {
-	if (Hit.BoneName.IsValid())
+	if (Cast<ATacBase>(OtherActor))
 	{
-		float DamageFactor = 1.f;
-		TArray<TCHAR> HitName = Hit.BoneName.ToString().GetCharArray();
-		if (FString(5, HitName.GetData()) == FString(TEXT("PhysW")))
-		{
-			DamageFactor = 0.75f;
-		}
-		else if (HitName.GetData() == FString(TEXT("Engine")))
-		{
-			DamageFactor = 2.f;
-		}
 		UGameplayStatics::ApplyDamage(
-		OtherActor,
-		DamageAmount * DamageFactor,
-		Instigator->GetController(),
-		OwnerGun,
-		UVehicleDamageType::StaticClass()
+			OtherActor,
+			DamageAmount,
+			GetInstigatorController(),
+			OwnerGun,
+			UVehicleDamageType::StaticClass()
 		);
+	}
+	else if (Cast<ATacVehicle>(OtherActor))
+	{
+		if (Hit.BoneName.IsValid())
+		{
+			float DamageFactor = 1.f;
+			TArray<TCHAR> HitName = Hit.BoneName.ToString().GetCharArray();
+			if (FString(4, HitName.GetData()) == FString(TEXT("Wel_")))
+			{
+				DamageFactor = 0.75f;
+			}
+			else if (HitName.GetData() == FString(TEXT("Engine")))
+			{
+				DamageFactor = 2.f;
+			}
+			UGameplayStatics::ApplyDamage(
+				OtherActor,
+				DamageAmount * DamageFactor,
+				Instigator->GetController(),
+				OwnerGun,
+				UVehicleDamageType::StaticClass()
+			);
+		}
 	}
 	Destroy();
 }

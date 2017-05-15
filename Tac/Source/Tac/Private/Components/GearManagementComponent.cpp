@@ -65,7 +65,6 @@ void UGearManagementComponent::TryPickup_Implementation(AGears * GearToPickup)
 	{
 		ATacPlayerState* OwnerPS = Cast<ATacPlayerState>(OwnerVehicle->PlayerState);
 		if (!OwnerPS) { return; }
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, *GearToPickup->GetName());
 		OwnerPS->AddGear(JudgeResult, GearToPickup->GetClass());
 		ATacController* TacCtrl = Cast<ATacController>(OwnerVehicle->Controller);
 		TacCtrl->AddGearSlot(JudgeResult);

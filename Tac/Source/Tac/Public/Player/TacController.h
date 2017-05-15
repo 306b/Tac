@@ -39,16 +39,25 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void OnPossessedTacDeath(bool bIsTeamA);
 
-	void ChooseRP(int32 RPIndex);
+	TSubclassOf<ATacVehicle> MyTac;
 
-	UFUNCTION(Client, Reliable)
-	void FindRPs();
-	void FindRPs_Implementation();
+	//UFUNCTION(Client, Reliable)
+	//void FindRPs();
+	//void FindRPs_Implementation();
 	void FindMonitor();
-
+	void FindPlayerStart();
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Spawn")
+	void InitSpawn(bool bAsTeamA);
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Spawn")
+	void SpawnRP(ARespawnPoint* RP);
+	UFUNCTION(Client, Reliable)
+	void HandleHUD(bool bEnableInput);
 	TArray<ARespawnPoint*> Respawnings;
+	FORCEINLINE ACameraActor* GetMonitor() const { return MonitorCamera; }
 
+	void InitCam();
 private:
-	
+	TArray<APlayerStart*> SpawnStart_A;
+	TArray<APlayerStart*> SpawnStart_B;
 	ACameraActor* MonitorCamera;
 };

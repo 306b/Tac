@@ -45,6 +45,7 @@ public:
 
 public:
 	// Dynamic multicast delegate
+	UPROPERTY(BlueprintAssignable)
 	FTacDelegate OnDeath;
 
 	UFUNCTION(BlueprintCallable, Category = State)

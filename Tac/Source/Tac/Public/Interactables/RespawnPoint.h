@@ -26,14 +26,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	//UFUNCTION(NetMulticast, Reliable)
 	void UpdateOccupation(float DeltaTime);
-	
-	// Spawn players' function
-	UFUNCTION(BlueprintCallable)
-	void SpawnPlayer(AController* PlayerController);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SpawnPlayer(AController* PlayerController);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SetOccupied(bool bOccupiedByA);
@@ -52,7 +46,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "State")
 	float GetOccupationVal();
-	
 
 private:
 	UPROPERTY(Replicated)

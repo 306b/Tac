@@ -77,13 +77,15 @@ void ARespawnPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	}
 }
 
+//bool ARespawnPoint::UpdateOccupation_Validate(float DeltaTime) { return true; }
+
 void ARespawnPoint::UpdateOccupation(float DeltaTime)
 {
 	if (Role == ROLE_Authority)
 	{
 		if (bShouldOccupy && NumAInRange != 0)
 		{
-			Val_Occupation = FMath::Clamp<float>(Val_Occupation + DeltaTime * float(NumAInRange) * 0.2, -10.f, 10.f);
+			Val_Occupation = FMath::Clamp<float>(Val_Occupation + DeltaTime * float(NumAInRange), -10.f, 10.f);
 			if (Val_Occupation == 10.f)
 			{
 				bShouldOccupy = false;
@@ -123,6 +125,7 @@ void ARespawnPoint::UpdateActorsInRange_Implementation(ATacVehicle* TacPawn, boo
 	ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
 	if (TacPS)
 	{
+		int32 Temp = NumAInRange;
 		if (TacPS->bIsGroup_A)
 		{
 			if (bBeginOverlap)
@@ -145,6 +148,10 @@ void ARespawnPoint::UpdateActorsInRange_Implementation(ATacVehicle* TacPawn, boo
 				NumAInRange = FMath::Clamp<int32>(++NumAInRange, -3, 3);
 			}
 		}
+		if (NumAInRange != Temp)
+		{
+			bShouldOccupy = true;
+		}
 	}
 	else
 	{
@@ -165,23 +172,3 @@ void ARespawnPoint::SetOccupied_Implementation(bool bOccupiedByA)
 		bOwnedByA = false;
 	}
 }
-
-bool ARespawnPoint::Server_SpawnPlayer_Validate(AController * PlayerController) { return true; }
-
-void ARespawnPoint::Server_SpawnPlayer_Implementation(AController * PlayerController)
-{
-	SpawnPlayer(PlayerController);
-}
-
-void ARespawnPoint::SpawnPlayer(AController * PlayerController)
-{
-	if (Role < ROLE_Authority)
-	{
-		Server_SpawnPlayer(PlayerController);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Server: %s"), *PlayerController->GetName());
-	}
-}
-
