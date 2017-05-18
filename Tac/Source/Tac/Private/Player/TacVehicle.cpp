@@ -112,6 +112,11 @@ void ATacVehicle::BeginPlay()
 
 }
 
+void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	DOREPLIFETIME(ATacVehicle, Energy);
+}
+
 void ATacVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -181,4 +186,24 @@ void ATacVehicle::UpdateState()
 	ATacPlayerState* TacPS = Cast<ATacPlayerState>(PlayerState);
 	if (!ensure(TacPS)) { return; }
 	GearManager->ResetGears();
+}
+
+bool ATacVehicle::UpdateEnergy(int32 Val)
+{
+	Energy += Val;
+	if (Energy < 0)
+	{
+		Energy = 0;
+		return false;
+	}
+	else if (Energy > MaxEnergy)
+	{
+		Energy = MaxEnergy;
+	}
+	return true;
+}
+
+void ATacVehicle::AttainEnergy()
+{
+	
 }
