@@ -86,7 +86,7 @@ public:
 	/** Called from player controller to update tac's state */
 	void UpdateState();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Energy)
+	UPROPERTY(Replicated)
 	int32 Energy;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Energy)
 	int32 MaxEnergy = 1000;
@@ -94,4 +94,6 @@ public:
 	bool UpdateEnergy(int32 Val);
 
 	void AttainEnergy();
+
+	FTimerHandle EnergyAttainTH;
 };

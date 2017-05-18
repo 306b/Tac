@@ -10,6 +10,16 @@ ATacPlayerState::ATacPlayerState()
 
 }
 
+void ATacPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	DOREPLIFETIME(ATacPlayerState, bIsGroup_A);
+}
+
+void ATacPlayerState::SetTeam(bool bTeamA)
+{
+	bIsGroup_A = bTeamA;
+}
+
 TArray<TSubclassOf<AGears>> ATacPlayerState::GetGears()
 {
 	return Gears;

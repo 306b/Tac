@@ -8,6 +8,7 @@
 #include "TacWidget.h"
 #include "TacVehicle.h"
 #include "TacGameModeBase.h"
+#include "TacGameStateBase.h"
 #include "RespawnPoint.h"
 #include "TacHUD.h"
 #include "GearManagementComponent.h"
@@ -275,6 +276,7 @@ bool ATacController::InitSpawn_Validate(bool bAsTeamA) { return true; }
 void ATacController::InitSpawn_Implementation(bool bAsTeamA)
 {
 	FTransform SpawnTransform;
+	ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
 	if (bAsTeamA)
 	{
 		if (!ensure(SpawnStart_A.IsValidIndex(0)))
@@ -286,7 +288,8 @@ void ATacController::InitSpawn_Implementation(bool bAsTeamA)
 		ATacPlayerState* TacPS = Cast<ATacPlayerState>(PlayerState);
 		if (TacPS)
 		{
-			TacPS->bIsGroup_A = true;
+			TacPS->SetTeam(true);
+			TacGS->TeamAPlayers.AddUnique(this);
 		}
 	}
 	else
@@ -300,7 +303,8 @@ void ATacController::InitSpawn_Implementation(bool bAsTeamA)
 		ATacPlayerState* TacPS = Cast<ATacPlayerState>(PlayerState);
 		if (TacPS)
 		{
-			TacPS->bIsGroup_A = false;
+			TacPS->SetTeam(false);
+			TacGS->TeamBPlayers.AddUnique(this);
 		}
 	}
 	SpawnTac(SpawnTransform);

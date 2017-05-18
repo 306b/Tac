@@ -11,6 +11,7 @@
 #include "TacHeader.h"
 #include "Gears.h"
 #include "TacPlayerState.h"
+#include "TacGameStateBase.h"
 #include "DamageComponent.h"
 #include "PickupComponent.h"
 #include "GearManagementComponent.h"
@@ -103,13 +104,12 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	// Create the pickup component
 	PickupVolume = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupVolume"));
 	BoostSpeed = 400.f;
-
 }
 
 void ATacVehicle::BeginPlay()
 {
 	Super::BeginPlay();
-
+	GetWorldTimerManager().SetTimer(EnergyAttainTH, this, &ATacVehicle::AttainEnergy, 1.f, true);
 }
 
 void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
@@ -205,5 +205,9 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 
 void ATacVehicle::AttainEnergy()
 {
-	
+	ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
+	ATacPlayerState* const TacPS = GetController()->PlayerState ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
+	int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
+	Energy += AttainRate;
+	UE_LOG(LogTemp, Warning, TEXT("Energy is :%i"), Energy);
 }
