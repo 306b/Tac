@@ -109,13 +109,15 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 void ATacVehicle::BeginPlay()
 {
 	Super::BeginPlay();
+	FTimerHandle EnergyAttainTH;
 	GetWorldTimerManager().SetTimer(EnergyAttainTH, this, &ATacVehicle::AttainEnergy, 1.f, true);
 }
 
-void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
-{
-	DOREPLIFETIME(ATacVehicle, Energy);
-}
+//void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+//{
+//	DOREPLIFETIME(ATacVehicle, Energy);
+//	//DOREPLIFETIME(ATacVehicle, EnergyAttainTH);
+//}
 
 void ATacVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -205,9 +207,12 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 
 void ATacVehicle::AttainEnergy()
 {
-	ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
-	ATacPlayerState* const TacPS = GetController()->PlayerState ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
-	int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
-	Energy += AttainRate;
-	UE_LOG(LogTemp, Warning, TEXT("Energy is :%i"), Energy);
+	if (Role < ROLE_Authority)
+	{
+		ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
+		ATacPlayerState* const TacPS = GetController()->PlayerState ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
+		int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
+		UpdateEnergy(AttainRate);
+		UE_LOG(LogTemp, Warning, TEXT("%s energy is :%i"), *this->GetName(), Energy);
+	}
 }

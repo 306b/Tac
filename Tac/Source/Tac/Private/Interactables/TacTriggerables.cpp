@@ -28,5 +28,5 @@ void ATacTriggerables::Tick(float DeltaTime)
 
 void ATacTriggerables::OnTriggered(ATacVehicle* TacPawn)
 {
-	if (TacPawn->UpdateEnergy(-1 * EnergyCost)) { return; }
+	
 }
