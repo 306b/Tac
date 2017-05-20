@@ -195,7 +195,7 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 	Energy += Val;
 	if (Energy < 0)
 	{
-		Energy = 0;
+		Energy -= Val;
 		return false;
 	}
 	else if (Energy > MaxEnergy)

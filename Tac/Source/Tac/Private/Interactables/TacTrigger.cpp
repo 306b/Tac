@@ -33,6 +33,13 @@ void ATacTrigger::Tick(float DeltaTime)
 
 void ATacTrigger::OnPress(ATacVehicle* TacPawn)
 {
-	if (TacPawn->UpdateEnergy(-1 * EnergyCost)) { return; }
-	TriggerActor->OnTriggered(TacPawn);
+	if (!(TacPawn->UpdateEnergy(-1 * EnergyCost))) { return; }
+	if (TriggerActor)
+	{
+		TriggerActor->OnTriggered(TacPawn);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("NULL"));
+	}
 }
