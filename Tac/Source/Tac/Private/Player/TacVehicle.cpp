@@ -210,7 +210,9 @@ void ATacVehicle::AttainEnergy()
 	if (Role < ROLE_Authority)
 	{
 		ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
+		if (!TacGS) { return; }
 		ATacPlayerState* const TacPS = GetController()->PlayerState ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
+		if (!TacPS) { return; }
 		int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
 		UpdateEnergy(AttainRate);
 		UE_LOG(LogTemp, Warning, TEXT("%s energy is :%i"), *this->GetName(), Energy);

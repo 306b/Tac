@@ -48,14 +48,7 @@ void ATacController::SetupInputComponent()
 ========================================================================================================*/
 void ATacController::SaveGame()
 {
-	/*
-	UTacSaveGame* SaveGameInstance = Cast<UTacSaveGame>(UGameplayStatics::CreateSaveGameObject(UTacSaveGame::StaticClass()));
-	ATacPlayerState* TacPS = Cast<ATacPlayerState>(PlayerState);
-	// Saves player's name, gears and transform
-	SaveGameInstance->PlayerName = TacPS->GetPlayerName();
-	SaveGameInstance->Gears = TacPS->GetGears();
-	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
-	*/
+	InitSpawn(false);
 
 }
 
@@ -138,7 +131,7 @@ void ATacController::HandleHUD_Implementation(bool bEnableInput)
 	{
 		if (bEnableInput)
 		{
-			SetInputMode(FInputModeUIOnly());
+			SetInputMode(FInputModeGameAndUI());
 			bShowMouseCursor = true;
 			bEnableClickEvents = true;
 			UE_LOG(LogTemp, Error, TEXT("UI"));
