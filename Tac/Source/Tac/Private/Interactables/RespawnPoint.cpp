@@ -59,7 +59,7 @@ void ARespawnPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 			auto DamageManager = Cast<UDamageComponent>(TacPawn->GetDamageManager());
 			DamageManager->OnDeath.AddUniqueDynamic(this, &ARespawnPoint::ChangeNumber);
 			UpdateActorsInRange(TacPawn, true);
-			UE_LOG(LogTemp, Warning, TEXT("In: Has %i A player"), NumAInRange);
+			//UE_LOG(LogTemp, Warning, TEXT("In: Has %i A player"), NumAInRange);
 		}
 	}
 }
@@ -72,7 +72,7 @@ void ARespawnPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Ot
 		if (TacPawn && Cast<USkeletalMeshComponent>(OtherComp))
 		{
 			UpdateActorsInRange(TacPawn, false);
-			UE_LOG(LogTemp, Warning, TEXT("Out: Has %i A player"), NumAInRange);
+			//UE_LOG(LogTemp, Warning, TEXT("Out: Has %i A player"), NumAInRange);
 		}
 	}
 }
@@ -96,7 +96,7 @@ void ARespawnPoint::UpdateOccupation(float DeltaTime)
 				bShouldOccupy = false;
 				SetOccupied(false);
 			}
-			UE_LOG(LogTemp, Log, TEXT("%f"), Val_Occupation);
+			//UE_LOG(LogTemp, Log, TEXT("%f"), Val_Occupation);
 		}
 	}
 }

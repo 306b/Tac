@@ -215,6 +215,5 @@ void ATacVehicle::AttainEnergy()
 		if (!TacPS) { return; }
 		int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
 		UpdateEnergy(AttainRate);
-		UE_LOG(LogTemp, Warning, TEXT("%s energy is :%i"), *this->GetName(), Energy);
 	}
 }
