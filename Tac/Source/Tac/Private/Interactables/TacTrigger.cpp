@@ -34,7 +34,7 @@ void ATacTrigger::Tick(float DeltaTime)
 void ATacTrigger::OnPress(ATacVehicle* TacPawn)
 {
 	if (!(TacPawn->UpdateEnergy(-1 * EnergyCost))) { return; }
-	if (TriggerActor)
+	if (TriggerActor && TriggerActor->bCanTrigger)
 	{
 		TriggerActor->OnTriggered(TacPawn);
 	}
