@@ -72,6 +72,8 @@ public:
 	void ZoomCamera(float val);
 	/** Pick up surrounding gear */
 	void PickupGear();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void OnPickup();
 
 public:
 
@@ -86,13 +88,13 @@ public:
 	/** Called from player controller to update tac's state */
 	void UpdateState();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Energy)
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = Energy)
 	int32 Energy;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Energy)
 	int32 MaxEnergy = 1000;
 
+	
 	bool UpdateEnergy(int32 Val);
-
 	void AttainEnergy();
 	
 };

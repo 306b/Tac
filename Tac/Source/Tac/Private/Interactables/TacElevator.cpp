@@ -18,7 +18,7 @@ ATacElevator::ATacElevator()
 
 	bAtUpper = false;
 	bReplicates = true;
-	MoveTime = 0.f;
+	MoveDelta = 0.f;
 }
 
 void ATacElevator::BeginPlay()
@@ -33,26 +33,32 @@ void ATacElevator::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (!bCanTrigger)
 	{
-		if (bAtUpper)
-		{
-			ElevatorFloor->SetWorldLocation(FMath::Lerp<FVector>(Upper, Lower, MoveTime += DeltaTime));
-		}
-		else
-		{
-			ElevatorFloor->SetWorldLocation(FMath::Lerp<FVector>(Lower, Upper, MoveTime += DeltaTime));
-		}
-		if (MoveTime >= 1.f)
-		{
-			bCanTrigger = true;
-			bAtUpper = !bAtUpper;
-			MoveTime = 0.f;
-		}
+		MoveFloor(DeltaTime);
 	}
 }
 
 void ATacElevator::OnTriggered(ATacVehicle* TacPawn)
 {
 	Super::OnTriggered(TacPawn);
-
 	bCanTrigger = false;
+}
+
+//bool ATacElevator::MoveFloor_Validate(float DelatTime) { return true; }
+
+void ATacElevator::MoveFloor(float DeltaTime)
+{
+	if (bAtUpper)
+	{
+		ElevatorFloor->SetWorldLocation(FMath::Lerp<FVector>(Upper, Lower, MoveDelta += DeltaTime * 0.2));
+	}
+	else
+	{
+		ElevatorFloor->SetWorldLocation(FMath::Lerp<FVector>(Lower, Upper, MoveDelta += DeltaTime * 0.2));
+	}
+	if (MoveDelta >= 1.f)
+	{
+		bCanTrigger = true;
+		bAtUpper = !bAtUpper;
+		MoveDelta = 0.f;
+	}
 }

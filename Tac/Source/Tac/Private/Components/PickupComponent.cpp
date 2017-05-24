@@ -38,6 +38,8 @@ void UPickupComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+//bool UPickupComponent::Pickup_Validate() { return true; }
+
 void UPickupComponent::Pickup()
 {
 	// Try to get gear in range

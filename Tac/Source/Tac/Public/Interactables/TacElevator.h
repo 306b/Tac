@@ -20,14 +20,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Elevator)
 	UStaticMeshComponent* ElevatorFloor;
-
 	virtual void OnTriggered(ATacVehicle* TacPawn) override;
 	virtual void Tick(float DeltaTime) override;
 private:
 	bool bAtUpper;
 	FVector Lower;
 	FVector Upper;
-	float MoveTime;
+	float MoveDelta;
+
+	void MoveFloor(float DeltaTime);
 protected:
 	virtual void BeginPlay() override;
 };

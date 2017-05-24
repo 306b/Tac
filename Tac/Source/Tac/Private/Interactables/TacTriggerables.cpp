@@ -10,6 +10,9 @@ ATacTriggerables::ATacTriggerables()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bCanTrigger = true;
+	bReplicates = true;
+	bReplicateMovement = true;
+	bAlwaysRelevant = true;
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +27,11 @@ void ATacTriggerables::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATacTriggerables::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	DOREPLIFETIME(ATacTriggerables, bCanTrigger);
 }
 
 void ATacTriggerables::OnTriggered(ATacVehicle* TacPawn)

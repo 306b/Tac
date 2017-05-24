@@ -113,11 +113,11 @@ void ATacVehicle::BeginPlay()
 	GetWorldTimerManager().SetTimer(EnergyAttainTH, this, &ATacVehicle::AttainEnergy, 1.f, true);
 }
 
-//void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
-//{
-//	DOREPLIFETIME(ATacVehicle, Energy);
-//	//DOREPLIFETIME(ATacVehicle, EnergyAttainTH);
-//}
+void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	DOREPLIFETIME(ATacVehicle, Energy);
+	//DOREPLIFETIME(ATacVehicle, EnergyAttainTH);
+}
 
 void ATacVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -160,7 +160,21 @@ void ATacVehicle::MoveRight(float Val)
 
 void ATacVehicle::PickupGear()
 {
-	PickupVolume->Pickup();
+	OnPickup();
+}
+
+bool ATacVehicle::OnPickup_Validate() { return true; }
+
+void ATacVehicle::OnPickup_Implementation()
+{
+	if (HasAuthority())
+	{
+		PickupVolume->Pickup();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("?"));
+	}
 }
 
 void ATacVehicle::RotateCamera(float val)
@@ -205,14 +219,16 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 	return true;
 }
 
+//bool ATacVehicle::AttainEnergy_Validate() { return true; }// TODO Vehicle can't move on server
+
 void ATacVehicle::AttainEnergy()
 {
 	if (Role < ROLE_Authority)
 	{
 		ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
 		if (!TacGS) { return; }
-		ATacPlayerState* const TacPS = GetController()->PlayerState ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
-		if (!TacPS) { return; }
+		ATacPlayerState* const TacPS = GetController() ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
+		if (!TacPS) { return; }// TODO Not access sometimes
 		int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
 		UpdateEnergy(AttainRate);
 	}

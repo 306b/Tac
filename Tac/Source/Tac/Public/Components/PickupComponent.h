@@ -32,5 +32,5 @@ public:
 	
 	/** For storaging owner tac's pick up capsule */
 	UCapsuleComponent* PickupCapsule;
-	
+
 };

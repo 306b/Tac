@@ -4,6 +4,7 @@
 #include "TacTrigger.h"
 #include "TacVehicle.h"
 #include "TacTriggerables.h"
+#include "UnrealNetwork.h"
 // Sets default values
 ATacTrigger::ATacTrigger()
 {
@@ -15,6 +16,8 @@ ATacTrigger::ATacTrigger()
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
 	CollisionBox->SetupAttachment(RootComponent);
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -31,15 +34,28 @@ void ATacTrigger::Tick(float DeltaTime)
 
 }
 
+//bool ATacTrigger::OnPress_Validate(ATacVehicle* TacPawn) { return true; }
+
 void ATacTrigger::OnPress(ATacVehicle* TacPawn)
 {
-	if (!(TacPawn->UpdateEnergy(-1 * EnergyCost))) { return; }
-	if (TriggerActor && TriggerActor->bCanTrigger)
+	if (HasAuthority())
 	{
-		TriggerActor->OnTriggered(TacPawn);
+		/*if (!(TacPawn->UpdateEnergy(-1 * EnergyCost)))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Auth"));
+			return;
+		}*/
+		if (TriggerActor && TriggerActor->bCanTrigger)
+		{
+			TriggerActor->OnTriggered(TacPawn);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("NULL"));
+		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("NULL"));
+		UE_LOG(LogTemp, Error, TEXT("OnPress no auth"));
 	}
 }

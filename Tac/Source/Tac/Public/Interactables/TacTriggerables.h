@@ -14,7 +14,6 @@ class TAC_API ATacTriggerables : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ATacTriggerables();
-
 	virtual void OnTriggered(ATacVehicle* TacPawn);
 protected:
 	// Called when the game starts or when spawned
@@ -24,5 +23,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
+	UPROPERTY(Replicated)
 	bool bCanTrigger;
 };
