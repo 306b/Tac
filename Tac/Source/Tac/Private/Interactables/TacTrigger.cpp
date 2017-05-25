@@ -38,13 +38,12 @@ void ATacTrigger::Tick(float DeltaTime)
 
 void ATacTrigger::OnPress(ATacVehicle* TacPawn)
 {
-	if (HasAuthority())
+	if (Role == ROLE_Authority)
 	{
-		/*if (!(TacPawn->UpdateEnergy(-1 * EnergyCost)))
+		if (!(TacPawn->UpdateEnergy(-1 * EnergyCost)))
 		{
-			UE_LOG(LogTemp, Error, TEXT("Auth"));
 			return;
-		}*/
+		}
 		if (TriggerActor && TriggerActor->bCanTrigger)
 		{
 			TriggerActor->OnTriggered(TacPawn);
@@ -53,9 +52,5 @@ void ATacTrigger::OnPress(ATacVehicle* TacPawn)
 		{
 			UE_LOG(LogTemp, Error, TEXT("NULL"));
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("OnPress no auth"));
 	}
 }

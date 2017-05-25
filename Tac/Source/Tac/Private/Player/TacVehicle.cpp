@@ -206,6 +206,10 @@ void ATacVehicle::UpdateState()
 
 bool ATacVehicle::UpdateEnergy(int32 Val)
 {
+	if (Energy + Val < 0)
+	{
+		return false;
+	}
 	Energy += Val;
 	if (Energy < 0)
 	{
@@ -216,6 +220,7 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 	{
 		Energy = MaxEnergy;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Energy: %i"), Energy);
 	return true;
 }
 
@@ -223,7 +228,7 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 
 void ATacVehicle::AttainEnergy()
 {
-	if (Role < ROLE_Authority)
+	if (Role == ROLE_Authority)
 	{
 		ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
 		if (!TacGS) { return; }
@@ -232,4 +237,15 @@ void ATacVehicle::AttainEnergy()
 		int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
 		UpdateEnergy(AttainRate);
 	}
+	else
+	{
+		ServerAttainEnergy();
+	}
+}
+
+bool ATacVehicle::ServerAttainEnergy_Validate() { return true; }
+
+void ATacVehicle::ServerAttainEnergy_Implementation()
+{
+	AttainEnergy();
 }

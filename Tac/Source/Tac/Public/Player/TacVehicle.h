@@ -96,5 +96,7 @@ public:
 	
 	bool UpdateEnergy(int32 Val);
 	void AttainEnergy();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerAttainEnergy();
 	
 };
