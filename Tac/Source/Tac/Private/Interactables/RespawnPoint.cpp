@@ -44,8 +44,10 @@ void ARespawnPoint::Tick(float DeltaTime)
 
 void ARespawnPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ARespawnPoint, bOwnedByA);
 	DOREPLIFETIME(ARespawnPoint, Val_Occupation);
+	DOREPLIFETIME(ARespawnPoint, bShouldOccupy);
 	//DOREPLIFETIME(ARespawnPoint, NumAInRange);
 }
 
@@ -57,7 +59,7 @@ void ARespawnPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 		if (TacPawn && Cast<USkeletalMeshComponent>(OtherComp))
 		{
 			auto DamageManager = Cast<UDamageComponent>(TacPawn->GetDamageManager());
-			DamageManager->OnDeath.AddUniqueDynamic(this, &ARespawnPoint::ChangeNumber);
+			DamageManager->OnDeath.AddUniqueDynamic(this, &ARespawnPoint::UpdateState);
 			UpdateActorsInRange(TacPawn, true);
 			//UE_LOG(LogTemp, Warning, TEXT("In: Has %i A player"), NumAInRange);
 		}
@@ -148,7 +150,7 @@ void ARespawnPoint::UpdateActorsInRange_Implementation(ATacVehicle* TacPawn, boo
 				NumAInRange = FMath::Clamp<int32>(++NumAInRange, -3, 3);
 			}
 		}
-		if (NumAInRange != Temp)
+		if (NumAInRange != Temp && NumAInRange != 0)
 		{
 			bShouldOccupy = true;
 		}
@@ -170,5 +172,27 @@ void ARespawnPoint::SetOccupied_Implementation(bool bOccupiedByA)
 	else
 	{
 		bOwnedByA = false;
+	}
+}
+
+void ARespawnPoint::UpdateState(bool bIsTeamA)
+{
+	TArray<AActor*> OverlappingActors;
+	SpawnRange->GetOverlappingActors(OverlappingActors, ATacVehicle::StaticClass());
+	for (auto Actor : OverlappingActors)
+	{
+		auto TacPawn = Cast<ATacVehicle>(Actor);
+		if (!TacPawn) { return; }
+		auto TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
+		if (!TacPS) { return; }
+		NumAInRange = 0;
+		if (TacPS->bIsGroup_A)
+		{
+			++NumAInRange;
+		}
+		else
+		{
+			--NumAInRange;
+		}
 	}
 }

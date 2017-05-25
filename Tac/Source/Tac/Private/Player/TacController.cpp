@@ -256,6 +256,18 @@ bool ATacController::SpawnRP_Validate(ARespawnPoint* RP) { return true; }
 
 void ATacController::SpawnRP_Implementation(ARespawnPoint* RP)
 {
+	if (RP->bShouldOccupy) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("bShouldOccupy"));
+		return; 
+	}
+	auto TacPS = Cast<ATacPlayerState>(PlayerState);
+	if (!TacPS) { return; }
+	if (TacPS->bIsGroup_A != RP->bOwnedByA) 
+	{ 
+		UE_LOG(LogTemp, Error, TEXT("Not match"));
+		return; 
+	}
 	auto SpawnOrigin = RP->SpawnRange->Bounds.Origin;
 	auto SpawnExtent = RP->SpawnRange->Bounds.BoxExtent;
 	SpawnOrigin.Z = SpawnOrigin.Z - SpawnExtent.Z + 10.f;

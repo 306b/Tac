@@ -47,15 +47,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "State")
 	float GetOccupationVal();
 
-private:
+	UPROPERTY(Replicated)
+	bool bShouldOccupy;
+
 	UPROPERTY(Replicated)
 	bool bOwnedByA;
 
+	UFUNCTION()
+	void UpdateState(bool bIsTeamA);
+private:
 	//UPROPERTY(Replicated)
 	int32 NumAInRange;
 
-	
-	bool bShouldOccupy;
 	UPROPERTY(Replicated)
 	float Val_Occupation;
 	
