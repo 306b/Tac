@@ -56,6 +56,6 @@ private:
 
 public:
 	int32 PlayerNumber;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = State)
 	bool bIsGroup_A;
 };
