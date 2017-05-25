@@ -109,15 +109,17 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 void ATacVehicle::BeginPlay()
 {
 	Super::BeginPlay();
-	FTimerHandle EnergyAttainTH;
-	GetWorldTimerManager().SetTimer(EnergyAttainTH, this, &ATacVehicle::AttainEnergy, 1.f, true);
+	if (HasAuthority())
+	{
+		FTimerHandle EnergyAttainTH;
+		GetWorldTimerManager().SetTimer(EnergyAttainTH, this, &ATacVehicle::AttainEnergy, 1.f, true);
+	}
 }
 
-void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
-{
-	DOREPLIFETIME(ATacVehicle, Energy);
-	//DOREPLIFETIME(ATacVehicle, EnergyAttainTH);
-}
+//void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+//{
+//	DOREPLIFETIME(ATacVehicle, Energy);
+//}
 
 void ATacVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -224,28 +226,12 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 	return true;
 }
 
-//bool ATacVehicle::AttainEnergy_Validate() { return true; }// TODO Vehicle can't move on server
-
 void ATacVehicle::AttainEnergy()
 {
-	if (Role == ROLE_Authority)
-	{
-		ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
-		if (!TacGS) { return; }
-		ATacPlayerState* const TacPS = GetController() ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
-		if (!TacPS) { return; }// TODO Not access sometimes
-		int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
-		UpdateEnergy(AttainRate);
-	}
-	else
-	{
-		ServerAttainEnergy();
-	}
-}
-
-bool ATacVehicle::ServerAttainEnergy_Validate() { return true; }
-
-void ATacVehicle::ServerAttainEnergy_Implementation()
-{
-	AttainEnergy();
+	ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
+	if (!TacGS) { return; }
+	ATacPlayerState* const TacPS = GetController() ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
+	if (!TacPS) { return; }// TODO Not access sometimes
+	int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
+	UpdateEnergy(AttainRate);
 }

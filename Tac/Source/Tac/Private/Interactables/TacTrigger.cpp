@@ -42,6 +42,7 @@ void ATacTrigger::OnPress(ATacVehicle* TacPawn)
 	{
 		if (!(TacPawn->UpdateEnergy(-1 * EnergyCost)))
 		{
+			UE_LOG(LogTemp, Error, TEXT("Energy: %i"), TacPawn->Energy);
 			return;
 		}
 		if (TriggerActor && TriggerActor->bCanTrigger)
