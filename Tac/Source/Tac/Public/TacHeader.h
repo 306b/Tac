@@ -44,6 +44,9 @@ struct FGearSpawn
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 SpawnAmount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnRate;
+
 	TSubclassOf<AActor> GetSpawnActor()
 	{
 		return WhatToSpawn;
@@ -52,6 +55,11 @@ struct FGearSpawn
 	int32 GetSpawnAmount()
 	{
 		return SpawnAmount;
+	}
+
+	float GetSpawnRate()
+	{
+		return SpawnRate;
 	}
 
 	FGearSpawn()

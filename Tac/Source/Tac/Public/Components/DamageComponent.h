@@ -54,6 +54,8 @@ public:
 	void StopRecoverArmor();
 	UFUNCTION(BlueprintCallable, Category = State)
 	void RecoverHealth(int32 val);
+
+	void CallDeath();
 	
 	void HandleDamage(float DamageVal, AActor* DamageCauser);
 	FTimerHandle ArmorRecoveryHandle;

@@ -93,8 +93,8 @@ void AGears::WorldSpawn()
 {
 	bPicked = false;
 	// Initialize timeline
-	Timeline->AddInterpFloat(TimelineCurve, InterpFunction);
-	Timeline->PlayFromStart();
+	/*Timeline->AddInterpFloat(TimelineCurve, InterpFunction);
+	Timeline->PlayFromStart();*/
 }
 
 void AGears::OnPicked()

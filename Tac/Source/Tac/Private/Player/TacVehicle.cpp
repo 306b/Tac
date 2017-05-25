@@ -223,7 +223,6 @@ bool ATacVehicle::UpdateEnergy(int32 Val)
 	{
 		Energy = MaxEnergy;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Energy: %i"), Energy);
 	return true;
 }
 

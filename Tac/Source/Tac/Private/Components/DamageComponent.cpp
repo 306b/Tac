@@ -85,20 +85,24 @@ void UDamageComponent::HandleDamage(float DamageVal, AActor* DamageCauser)
 	Health = FMath::Clamp<int32>(Health - DamVal, 0, MaxHealth);
 	if (Health <= 0)
 	{
-		ATacVehicle* TacPawn = Cast<ATacVehicle>(GetOwner());
-		if (!TacPawn) { return; }
-		ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
-		if (!TacPS) { return; }
-		if (TacPS->bIsGroup_A)
-		{
-			OnDeath.Broadcast(true);
-		}
-		else
-		{
-			OnDeath.Broadcast(false);
-		}
+		CallDeath();
 	}
 	StopRecoverArmor();
 	//UE_LOG(LogTemp, Log, TEXT("\nHealth: %i	DamageReceived: %i\nArmor: %i"), Health, (int32)DamVal, (int32)Armor);
 }
 
+void UDamageComponent::CallDeath()
+{
+	ATacVehicle* TacPawn = Cast<ATacVehicle>(GetOwner());
+	if (!TacPawn) { return; }
+	ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
+	if (!TacPS) { return; }
+	if (TacPS->bIsGroup_A)
+	{
+		OnDeath.Broadcast(true);
+	}
+	else
+	{
+		OnDeath.Broadcast(false);
+	}
+}
