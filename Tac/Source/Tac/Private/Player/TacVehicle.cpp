@@ -116,10 +116,11 @@ void ATacVehicle::BeginPlay()
 	}
 }
 
-//void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
-//{
-//	DOREPLIFETIME(ATacVehicle, Energy);
-//}
+void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ATacVehicle, Energy);
+}
 
 void ATacVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
