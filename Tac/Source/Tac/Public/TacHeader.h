@@ -68,3 +68,19 @@ struct FGearSpawn
 		SpawnAmount = 1;
 	}
 };
+
+USTRUCT(Blueprintable)
+struct FPlayerInfo
+{
+	GENERATED_BODY();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText PlayerName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* PlayerImage;
+
+	FPlayerInfo()
+	{
+		PlayerImage = nullptr;
+	}
+	
+};
