@@ -77,7 +77,8 @@ struct FPlayerInfo
 	FText PlayerName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* PlayerImage;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText PlayerStatus;
 	FPlayerInfo()
 	{
 		PlayerImage = nullptr;
