@@ -42,6 +42,7 @@ void ATacGameModeBase::PostLogin(APlayerController* NewController)
 	Super::PostLogin(NewController);
 	if (HasAuthority())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PostLogin"));
 		ATacPlayerState* NewTacPlayerState = Cast<ATacPlayerState>(NewController->PlayerState);
 		NewTacPlayerState->PlayerNumber = GameState->PlayerArray.Num();
 		ATacController* NewTacController = Cast<ATacController>(NewController);
@@ -53,9 +54,11 @@ void ATacGameModeBase::RespawnPlayerEvent(AController * PlayerController)
 {
 	if (HasAuthority())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("RespawnPlayerEvent"));
 		if (PlayerController->GetPawn())
 		{
 			PlayerController->GetPawn()->Destroy();
+			PlayerController->UnPossess();
 		}
 		ATacController* TacController = Cast<ATacController>(PlayerController);
 		TacController->InitCam();

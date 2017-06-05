@@ -54,7 +54,7 @@ public:
 	void HandleHUD(bool bEnableInput);
 	TArray<ARespawnPoint*> Respawnings;
 	FORCEINLINE ACameraActor* GetMonitor() const { return MonitorCamera; }
-
+	UFUNCTION(Server, Reliable, WithValidation)
 	void InitCam();
 private:
 	TArray<APlayerStart*> SpawnStart_A;

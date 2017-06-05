@@ -144,6 +144,7 @@ void ATacController::HandleHUD_Implementation(bool bEnableInput)
 			UE_LOG(LogTemp, Error, TEXT("Game"));
 		}
 	}
+	UE_LOG(LogTemp, Error, TEXT("HandleHUD"));
 }
 
 bool ATacController::UpdateVehicle_Validate() { return true; }
@@ -177,6 +178,7 @@ void ATacController::ClientPostLogin_Implementation()
 {
 	if (HasAuthority())
 	{
+		UE_LOG(LogTemp, Error, TEXT("ClientPostLogin"));
 		if (!ensure(PlayerState))
 		{
 			UE_LOG(LogTemp, Error, TEXT("No playerstate"));
@@ -190,9 +192,9 @@ void ATacController::ClientPostLogin_Implementation()
 			UE_LOG(LogTemp, Error, TEXT("No gamemode"));
 			return;
 		}
+		FindMonitor();
 		ATacGameModeBase* TacGameMode = Cast<ATacGameModeBase>(CurrentGameMode);
 		TacGameMode->RespawnPlayerEvent(this);
-		UE_LOG(LogTemp, Error, TEXT("Server"));
 	}
 }
 
@@ -225,6 +227,7 @@ void ATacController::FindMonitor()
 	{
 		if (Actor->ActorHasTag(TEXT("Monitor")))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("%s: FindMonitor"), *this->GetName());
 			auto MC = Cast<ACameraActor>(Actor);
 			MonitorCamera = MC;
 		}
@@ -316,10 +319,17 @@ void ATacController::InitSpawn_Implementation(bool bAsTeamA)
 	HandleHUD(false);
 }
 
-void ATacController::InitCam()
+bool ATacController::InitCam_Validate() { return true; }
+
+void ATacController::InitCam_Implementation()
 {
 	if (HasAuthority())
 	{
+		if(!MonitorCamera)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Not found camera"));
+			return;
+		}
 		SetViewTarget(MonitorCamera);
 		HandleHUD(true);
 	}
