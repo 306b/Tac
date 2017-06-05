@@ -24,13 +24,13 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	/*=======================================================================================================
 		Initialize Tac's mesh, ainmation, movement component, camera, pickup component and gear component
 	=======================================================================================================*/
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TacMesh(TEXT("SkeletalMesh'/Game/Tac/Characters/SK_Tac.SK_Tac'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TacMesh(TEXT("SkeletalMesh'/Game/Tac/Development/SK_Ugly.SK_Ugly'"));
 	if (TacMesh.Object)
 	{
 		GetMesh()->SetSkeletalMesh(TacMesh.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> TacAnim(TEXT("/Game/Tac/Core/Characters/ABP_TacPawn"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> TacAnim(TEXT("/Game/Tac/Development/ABP_Ugly"));
 	if (TacAnim.Class)
 	{
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
@@ -41,8 +41,8 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	check(Vehicle4W->WheelSetups.Num() == 4); // Vehicle wheel's amount needs to be 4 when using WheeledVehicleMovementComponent
 
-	static ConstructorHelpers::FClassFinder<UVehicleWheel> FrontWheel(TEXT("/Game/Tac/Core/Characters/BP_TacWheel_Front"));
-	static ConstructorHelpers::FClassFinder<UVehicleWheel> RearWheel(TEXT("/Game/Tac/Core/Characters/BP_TacWheel_Rear"));
+	static ConstructorHelpers::FClassFinder<UVehicleWheel> FrontWheel(TEXT("/Game/Tac/Development/BP_UglyWheel_Front"));
+	static ConstructorHelpers::FClassFinder<UVehicleWheel> RearWheel(TEXT("/Game/Tac/Development/BP_UglyWheel_Rear"));
 	if (FrontWheel.Class && RearWheel.Class)
 	{
 		Vehicle4W->WheelSetups[0].WheelClass = FrontWheel.Class;
