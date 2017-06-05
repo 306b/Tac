@@ -17,10 +17,10 @@
 ATacController::ATacController()
 {
 	MyTac = ATacVehicle::StaticClass();
-	static ConstructorHelpers::FObjectFinder<UBlueprint> TacPawn(TEXT("/Game/Tac/Core/Characters/BP_Tac"));
+	static ConstructorHelpers::FObjectFinder<UClass> TacPawn(TEXT("Class'/Game/Tac/Core/Characters/BP_Tac.BP_Tac_C'"));
 	if (TacPawn.Succeeded())
 	{
-		MyTac = (UClass*)TacPawn.Object->GeneratedClass;
+		MyTac = (UClass*)TacPawn.Object;
 	}
 }
 
