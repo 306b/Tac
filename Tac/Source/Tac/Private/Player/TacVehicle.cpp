@@ -11,6 +11,7 @@
 #include "TacHeader.h"
 #include "Gears.h"
 #include "TacPlayerState.h"
+#include "TacGameStateBase.h"
 #include "DamageComponent.h"
 #include "PickupComponent.h"
 #include "GearManagementComponent.h"
@@ -23,13 +24,13 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	/*=======================================================================================================
 		Initialize Tac's mesh, ainmation, movement component, camera, pickup component and gear component
 	=======================================================================================================*/
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TacMesh(TEXT("SkeletalMesh'/Game/Tac/Characters/SK_Tac.SK_Tac'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TacMesh(TEXT("SkeletalMesh'/Game/Tac/Development/SK_Ugly.SK_Ugly'"));
 	if (TacMesh.Object)
 	{
 		GetMesh()->SetSkeletalMesh(TacMesh.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> TacAnim(TEXT("/Game/Tac/Core/Characters/ABP_TacPawn"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> TacAnim(TEXT("/Game/Tac/Development/ABP_Ugly"));
 	if (TacAnim.Class)
 	{
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
@@ -40,8 +41,8 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	check(Vehicle4W->WheelSetups.Num() == 4); // Vehicle wheel's amount needs to be 4 when using WheeledVehicleMovementComponent
 
-	static ConstructorHelpers::FClassFinder<UVehicleWheel> FrontWheel(TEXT("/Game/Tac/Core/Characters/BP_TacWheel_Front"));
-	static ConstructorHelpers::FClassFinder<UVehicleWheel> RearWheel(TEXT("/Game/Tac/Core/Characters/BP_TacWheel_Rear"));
+	static ConstructorHelpers::FClassFinder<UVehicleWheel> FrontWheel(TEXT("/Game/Tac/Development/BP_UglyWheel_Front"));
+	static ConstructorHelpers::FClassFinder<UVehicleWheel> RearWheel(TEXT("/Game/Tac/Development/BP_UglyWheel_Rear"));
 	if (FrontWheel.Class && RearWheel.Class)
 	{
 		Vehicle4W->WheelSetups[0].WheelClass = FrontWheel.Class;
@@ -103,13 +104,22 @@ ATacVehicle::ATacVehicle(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	// Create the pickup component
 	PickupVolume = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupVolume"));
 	BoostSpeed = 400.f;
-
 }
 
 void ATacVehicle::BeginPlay()
 {
 	Super::BeginPlay();
+	if (HasAuthority())
+	{
+		FTimerHandle EnergyAttainTH;
+		GetWorldTimerManager().SetTimer(EnergyAttainTH, this, &ATacVehicle::AttainEnergy, 1.f, true);
+	}
+}
 
+void ATacVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ATacVehicle, Energy);
 }
 
 void ATacVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -153,7 +163,21 @@ void ATacVehicle::MoveRight(float Val)
 
 void ATacVehicle::PickupGear()
 {
-	PickupVolume->Pickup();
+	OnPickup();
+}
+
+bool ATacVehicle::OnPickup_Validate() { return true; }
+
+void ATacVehicle::OnPickup_Implementation()
+{
+	if (HasAuthority())
+	{
+		PickupVolume->Pickup();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("?"));
+	}
 }
 
 void ATacVehicle::RotateCamera(float val)
@@ -181,4 +205,33 @@ void ATacVehicle::UpdateState()
 	ATacPlayerState* TacPS = Cast<ATacPlayerState>(PlayerState);
 	if (!ensure(TacPS)) { return; }
 	GearManager->ResetGears();
+}
+
+bool ATacVehicle::UpdateEnergy(int32 Val)
+{
+	if (Energy + Val < 0)
+	{
+		return false;
+	}
+	Energy += Val;
+	if (Energy < 0)
+	{
+		Energy -= Val;
+		return false;
+	}
+	else if (Energy > MaxEnergy)
+	{
+		Energy = MaxEnergy;
+	}
+	return true;
+}
+
+void ATacVehicle::AttainEnergy()
+{
+	ATacGameStateBase* const TacGS = GetWorld() ? GetWorld()->GetGameState<ATacGameStateBase>() : NULL;
+	if (!TacGS) { return; }
+	ATacPlayerState* const TacPS = GetController() ? Cast<ATacPlayerState>(GetController()->PlayerState) : NULL;
+	if (!TacPS) { return; }// TODO Not access sometimes
+	int32 AttainRate = TacGS->GetEnergyAttainRate(TacPS->bIsGroup_A);
+	UpdateEnergy(AttainRate);
 }

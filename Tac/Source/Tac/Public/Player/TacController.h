@@ -6,10 +6,12 @@
 #include "TacVehicle.h"
 #include "TacController.generated.h"
 
-class TacGameModeBase;
+class ATacGameModeBase;
+class ARespawnPoint;
 /**
  * 
  */
+
 UCLASS()
 class TAC_API ATacController : public APlayerController
 {
@@ -19,9 +21,6 @@ public:
 	ATacController();
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-
-	// Variable to hold the widget After Creating it.
-	class UGearWidget* TacView;
 
 	/** Save the game */
 	void SaveGame();
@@ -35,12 +34,30 @@ public:
 	void AddGearSlot(int32 GearIndex);
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ClientPostLogin();
-	UFUNCTION(Client, Reliable)
-	void UpdateHUD();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void SpawnTac(FTransform SpawnTransform);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void OnPossessedTacDeath(bool bIsTeamA);
 
+	TSubclassOf<ATacVehicle> MyTac;
+
+	//UFUNCTION(Client, Reliable)
+	//void FindRPs();
+	//void FindRPs_Implementation();
+	void FindMonitor();
+	void FindPlayerStart();
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Spawn")
+	void InitSpawn(bool bAsTeamA);
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Spawn")
+	void SpawnRP(ARespawnPoint* RP);
+	UFUNCTION(Client, Reliable)
+	void HandleHUD(bool bEnableInput);
+	TArray<ARespawnPoint*> Respawnings;
+	FORCEINLINE ACameraActor* GetMonitor() const { return MonitorCamera; }
+	UFUNCTION(Server, Reliable, WithValidation)
+	void InitCam();
 private:
-	/** Widget blueprint's reference */
-	UPROPERTY()
-	TSubclassOf<class UUserWidget> PlayerView;
-	
+	TArray<APlayerStart*> SpawnStart_A;
+	TArray<APlayerStart*> SpawnStart_B;
+	ACameraActor* MonitorCamera;
 };

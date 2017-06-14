@@ -42,46 +42,27 @@ void ATacGameModeBase::PostLogin(APlayerController* NewController)
 	Super::PostLogin(NewController);
 	if (HasAuthority())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PostLogin"));
 		ATacPlayerState* NewTacPlayerState = Cast<ATacPlayerState>(NewController->PlayerState);
 		NewTacPlayerState->PlayerNumber = GameState->PlayerArray.Num();
 		ATacController* NewTacController = Cast<ATacController>(NewController);
 		NewTacController->ClientPostLogin();
-		NewTacController->UpdateHUD();
 	}
 }
 
 void ATacGameModeBase::RespawnPlayerEvent(AController * PlayerController)
 {
-	if (PlayerController->GetPawn())
+	if (HasAuthority())
 	{
-		PlayerController->GetPawn()->Destroy();
-	}
-	ATacPlayerState* TacPlayerState = Cast<ATacPlayerState>(PlayerController->PlayerState);
-	FTransform SpawnTransform;
-	if (TacPlayerState->bIsGroup_A)
-	{
-		if (!ensure(SpawnStart_A.IsValidIndex(0)))
+		UE_LOG(LogTemp, Warning, TEXT("RespawnPlayerEvent"));
+		if (PlayerController->GetPawn())
 		{
-			UE_LOG(LogTemp, Error, TEXT("No PlayerStart_A for Group_A"));
-			return;
+			PlayerController->GetPawn()->Destroy();
+			PlayerController->UnPossess();
 		}
-		SpawnTransform = SpawnStart_A[0]->GetActorTransform();
+		ATacController* TacController = Cast<ATacController>(PlayerController);
+		TacController->InitCam();
 	}
-	else
-	{
-		if (!ensure(SpawnStart_B.IsValidIndex(0)))
-		{
-			UE_LOG(LogTemp, Error, TEXT("No PlayerStart_B for Group_B"));
-			return;
-		}
-		int32 StartIndex = FMath::RandRange(0, SpawnStart_B.Num() - 1);
-		SpawnTransform = SpawnStart_B[StartIndex]->GetActorTransform();
-		SpawnStart_B.RemoveAt(StartIndex);
-	}
-	ATacVehicle* NewTac = GetWorld()->SpawnActor<ATacVehicle>(ATacVehicle::StaticClass(), SpawnTransform);// TODO spawn BP
-	PlayerController->Possess(NewTac);
-	ATacController* TacController = Cast<ATacController>(PlayerController);
-	TacController->UpdateVehicle();
 }
 
 void ATacGameModeBase::ActiveGearVolume()

@@ -8,6 +8,7 @@ public class TacTarget : TargetRules
 	public TacTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
+        bUsesSteam = true;
 	}
 
 	//

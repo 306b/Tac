@@ -41,6 +41,8 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void EmptyGears();
+
+	void SetTeam(bool bTeamA);
 private:
 	/*==========================================
 		Saves player state for synchronizing	
@@ -50,7 +52,10 @@ private:
 	FString MyPlayerName = TEXT("Tacky");
 	int32 GearsAmount;
 	
+	
+
 public:
 	int32 PlayerNumber;
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = State)
 	bool bIsGroup_A;
 };

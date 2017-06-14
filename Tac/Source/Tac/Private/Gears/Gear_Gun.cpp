@@ -1,4 +1,4 @@
-// Copyright by GameDream.
+	// Copyright by GameDream.
 
 #include "Tac.h"
 #include "Gear_Gun.h"
@@ -23,10 +23,16 @@ void AGear_Gun::OnLClickHit_Implementation(AActor* Target)
 	{
 		auto SpawnLocation = GunMesh->GetSocketLocation(TEXT("Fire"));
 		auto SpawnRotation = GunMesh->GetSocketRotation(TEXT("Fire"));
-		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-		Projectile->Instigator = Cast<APawn>(Target);
-		Projectile->OwnerGun = this;
-		Projectile->CollisionSphere->IgnoreActorWhenMoving(Target, true);
-		Projectile->LaunchProjectile();
+		auto SpawnTransform = GunMesh->GetSocketTransform(TEXT("Fire"));
+		auto Projectile = Cast<AProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), ProjectileClass, SpawnTransform, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn, Target));
+		if (Projectile)
+		{
+			Projectile->Instigator = Cast<APawn>(Target);
+			Projectile->OwnerGun = this;
+			Projectile->CollisionSphere->IgnoreActorWhenMoving(this, true);
+			Projectile->CollisionSphere->IgnoreActorWhenMoving(Target, true);
+			UGameplayStatics::FinishSpawningActor(Projectile, Projectile->GetActorTransform());
+			Projectile->LaunchProjectile();
+		}
 	}
 }

@@ -6,7 +6,7 @@
 #include "TacHeader.h"
 #include "DamageComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTacDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTacDelegate, bool, bIsTeamA);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TAC_API UDamageComponent : public UActorComponent
@@ -45,6 +45,7 @@ public:
 
 public:
 	// Dynamic multicast delegate
+	UPROPERTY(BlueprintAssignable)
 	FTacDelegate OnDeath;
 
 	UFUNCTION(BlueprintCallable, Category = State)
@@ -53,6 +54,8 @@ public:
 	void StopRecoverArmor();
 	UFUNCTION(BlueprintCallable, Category = State)
 	void RecoverHealth(int32 val);
+
+	void CallDeath();
 	
 	void HandleDamage(float DamageVal, AActor* DamageCauser);
 	FTimerHandle ArmorRecoveryHandle;

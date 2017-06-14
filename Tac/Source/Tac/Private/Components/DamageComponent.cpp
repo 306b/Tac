@@ -2,6 +2,8 @@
 
 #include "Tac.h"
 #include "DamageComponent.h"
+#include "TacVehicle.h"
+#include "TacPlayerState.h"
 #include "Gear_Gun.h"
 
 
@@ -81,7 +83,26 @@ void UDamageComponent::HandleDamage(float DamageVal, AActor* DamageCauser)
 		Armor = FMath::Clamp<float>(Armor - DamVal * 0.5, 0, MaxArmor);
 	}
 	Health = FMath::Clamp<int32>(Health - DamVal, 0, MaxHealth);
+	if (Health <= 0)
+	{
+		CallDeath();
+	}
 	StopRecoverArmor();
 	//UE_LOG(LogTemp, Log, TEXT("\nHealth: %i	DamageReceived: %i\nArmor: %i"), Health, (int32)DamVal, (int32)Armor);
 }
 
+void UDamageComponent::CallDeath()
+{
+	ATacVehicle* TacPawn = Cast<ATacVehicle>(GetOwner());
+	if (!TacPawn) { return; }
+	ATacPlayerState* TacPS = Cast<ATacPlayerState>(TacPawn->PlayerState);
+	if (!TacPS) { return; }
+	if (TacPS->bIsGroup_A)
+	{
+		OnDeath.Broadcast(true);
+	}
+	else
+	{
+		OnDeath.Broadcast(false);
+	}
+}

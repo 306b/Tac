@@ -6,6 +6,7 @@
 #include "TacHeader.h"
 #include "GearManagementComponent.h"
 #include "TacVehicle.h"
+#include "TacTrigger.h"
 
 
 // Sets default values for this component's properties
@@ -37,27 +38,39 @@ void UPickupComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+//bool UPickupComponent::Pickup_Validate() { return true; }
+
 void UPickupComponent::Pickup()
 {
 	// Try to get gear in range
 	TArray<AActor*> ActorsInRange;
-	PickupCapsule->GetOverlappingActors(ActorsInRange, AGears::StaticClass());
+	PickupCapsule->GetOverlappingActors(ActorsInRange);
+	if (!ActorsInRange.IsValidIndex(0))
+	{
+		return;
+	}
 	for (int32 ActorIndex = 0; ActorIndex<ActorsInRange.Num();	)
 	{
 		auto Gear = Cast<AGears>(ActorsInRange[ActorIndex]);
-		if (Gear->bPicked)
+		if (Gear)
 		{
-			ActorsInRange.Remove(Gear);
-			continue;
+			if (Gear->bPicked)
+			{
+				ActorsInRange.Remove(Gear);
+				continue;
+			}
+			AGears* GearToAdd = Cast<AGears>(ActorsInRange[ActorIndex]);
+			// Try to add the gear to tac
+			UGearManagementComponent* Manager = Cast<UGearManagementComponent>(OwnerVehicle->GetGearManager());
+			Manager->TryPickup(GearToAdd);
+			break;
+		}
+		auto Trigger = Cast<ATacTrigger>(ActorsInRange[ActorIndex]);
+		if (Trigger)
+		{
+			Trigger->OnPress(OwnerVehicle);
+			break;
 		}
 		ActorIndex++;
 	}
-	if (!ActorsInRange.IsValidIndex(0)) 
-	{
-		return; 
-	}
-	AGears* Gear = Cast<AGears>(ActorsInRange[0]);
-	// Try to add the gear to tac
-	UGearManagementComponent* Manager = Cast<UGearManagementComponent>(OwnerVehicle->GetGearManager());
-	Manager->TryPickup(Gear);
 }

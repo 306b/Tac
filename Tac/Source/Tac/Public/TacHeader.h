@@ -44,6 +44,9 @@ struct FGearSpawn
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 SpawnAmount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnRate;
+
 	TSubclassOf<AActor> GetSpawnActor()
 	{
 		return WhatToSpawn;
@@ -54,9 +57,31 @@ struct FGearSpawn
 		return SpawnAmount;
 	}
 
+	float GetSpawnRate()
+	{
+		return SpawnRate;
+	}
+
 	FGearSpawn()
 	{
 		WhatToSpawn = NULL;
 		SpawnAmount = 1;
 	}
+};
+
+USTRUCT(Blueprintable)
+struct FPlayerInfo
+{
+	GENERATED_BODY();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText PlayerName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* PlayerImage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText PlayerStatus;
+	FPlayerInfo()
+	{
+		PlayerImage = nullptr;
+	}
+	
 };
